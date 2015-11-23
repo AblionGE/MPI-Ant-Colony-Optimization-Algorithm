@@ -31,7 +31,7 @@ speedup16 = base ./ result(5,:)
 % speedup64 = base ./ result(7,:)
 
 figure
-plot(nodes,optimalSpeedup,'b--x',nodes,speedup2,'r:x',nodes,speedup4,'y--o',nodes,speedup8,'g:o',nodes,speedup16)%nodes,speedup32,nodes,speedup64)
+plot(nodes,optimalSpeedup,'b-x',nodes,speedup2,'r-x',nodes,speedup4,'k-o',nodes,speedup8,'g-o',nodes,speedup16)%nodes,speedup32,nodes,speedup64)
 legend('optimalSpeedup', '2 ants', '4 ants', '8 ants', '16 ants', 'Location', 'northwest')
 title('Theoretical Speedup for 1000 cities and 3000 iterations')
 xlabel('Nb of Processors')
