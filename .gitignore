@@ -76,3 +76,4 @@ mpi_ant_colony
 generate_map
 *.swp
 */*.swp
+*.pdf

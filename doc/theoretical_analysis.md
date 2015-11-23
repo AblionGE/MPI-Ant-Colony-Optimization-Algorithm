@@ -225,7 +225,7 @@ With these values, we can do some computations to estimate the time for computat
 \end{figure}
 
 \begin{figure}[!h]
-  \centering \includegraphics[scale=0.35]{img/theoretical_speedup.jpg}
+  \centering \includegraphics[scale=0.5]{img/theoretical_speedup.jpg}
   \caption{\it Theoretical speedup for 1000 cities and 3000 iterations (30 * 100) based on figure \ref{computations}.}
   \label{theoretical_speedup}
 \end{figure}
