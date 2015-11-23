@@ -34,7 +34,6 @@ int main(int argc, char* argv[]) {
   float evaporationCoeff = atof(argv[6]);
   int nCities = 0;
 
-  start = second();
   // Load the map and the number of cities
   std::ifstream in;
   in.open(mapFile);
@@ -84,9 +83,6 @@ int main(int argc, char* argv[]) {
       pheromons[i][j] = 0.1;
     }
   }
-  end = second();
-
-  printf("Initialization time : %f\n", end - start);
 
   loop_counter = 0;
 
@@ -94,8 +90,6 @@ int main(int argc, char* argv[]) {
   while (loop_counter < iterations) {
 
     printf("Loop nr. : %d\n", loop_counter);
-
-    start = second();
 
     // Loop over each ant
     for (ant_counter = 0; ant_counter < nAnts; ant_counter++) {
@@ -142,22 +136,18 @@ int main(int argc, char* argv[]) {
     updatePheromons(pheromons, bestPath, bestCost, nCities);
 
     loop_counter++;
-    end = second();
-    printf("Time : %f\n", end-start);
+    printf("best cost : %d\n", bestCost);
   }
 
   printPath(bestPath, nCities);
   printf("best cost : %d\n", bestCost);
 
   // simulation of merge part
-  start = second();
   for (i = 0; i < nCities - 1; i++) {
     pheromons[bestPath[i]][bestPath[i+1]] = 1;
   }
   pheromons[bestPath[nCities-1]][bestPath[0]] = 1;
-  end = second();
 
-  printf("Merge time : %f\n", end - start);
 
 
   // deallocation of the rows
