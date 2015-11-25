@@ -1,3 +1,4 @@
+#include <mpi.h>
 #include "utils.h"
 
 #ifndef max
@@ -15,6 +16,13 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
+  MPI_Status status;
+
+  int prank, psize;
+
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &prank);
+  MPI_Comm_size(MPI_COMM_WORLD, &psize);
 
   int i, j, loop_counter, ant_counter, cities_counter;
   int **map = NULL;
@@ -34,37 +42,41 @@ int main(int argc, char* argv[]) {
   float evaporationCoeff = atof(argv[6]);
   int nCities = 0;
 
-  // Load the map and the number of cities
-  std::ifstream in;
-  in.open(mapFile);
+  if (prank == 0) {
+    // Load the map and the number of cities
+    std::ifstream in;
+    in.open(mapFile);
 
-  if (!in.is_open()) {
-    printf("Cannot open file.\n");
-    printf("The filepath %s is incorrect\n", mapFile);
-    return -1;
+    if (!in.is_open()) {
+      printf("Cannot open file.\n");
+      printf("The filepath %s is incorrect\n", mapFile);
+      return -1;
+    }
+    char out[8];
+    in >> out;
+
+    // Define number of cities
+    nCities = atoi(out);
+
+    // Allocation of map
+    map = (int**) malloc(nCities*sizeof(int*));
+    for (i = 0; i < nCities; i++) {
+      map[i] = (int*) malloc(nCities*sizeof(int));
+
+    }
+
+    in.close();
+
+    // Load the map inside map variable
+    if (LoadCities(mapFile, map)) {
+      printf("The filepath %s is incorrect\n", mapFile);
+      return -1;
+    }
+
+    printf("Number of cities : %d\n", nCities);
   }
-  char out[8];
-  in >> out;
 
-  // Define number of cities
-  nCities = atoi(out);
-
-  // Allocation of map
-  map = (int**) malloc(nCities*sizeof(int*));
-  for (i = 0; i < nCities; i++) {
-    map[i] = (int*) malloc(nCities*sizeof(int));
-
-  }
-
-  in.close();
-
-  // Load the map inside map variable
-  if (LoadCities(mapFile, map)) {
-    printf("The filepath %s is incorrect\n", mapFile);
-    return -1;
-  }
-
-  printf("Number of cities : %d\n", nCities);
+  // TODO : send/recv the cities matrix
 
   // Allocation of pheromons
   pheromons = (float**) malloc(nCities*sizeof(float*));
@@ -85,6 +97,10 @@ int main(int argc, char* argv[]) {
   }
 
   loop_counter = 0;
+
+  // TODO : add external and internal iterations
+  // Between all external iterations : send BP to master
+  // and send back the matrix
 
   // External loop
   while (loop_counter < iterations) {
@@ -139,8 +155,10 @@ int main(int argc, char* argv[]) {
     printf("best cost : %d\n", bestCost);
   }
 
-  printPath(bestPath, nCities);
-  printf("best cost : %d\n", bestCost);
+  if (prank == 0) {
+    printPath(bestPath, nCities);
+    printf("best cost : %d\n", bestCost);
+  }
 
   // simulation of merge part
   for (i = 0; i < nCities - 1; i++) {
@@ -161,6 +179,8 @@ int main(int argc, char* argv[]) {
   free(pheromons);
   free(bestPath);
   free(currentPath);
+
+  MPI_Finalize();
 
   return 0;
 }

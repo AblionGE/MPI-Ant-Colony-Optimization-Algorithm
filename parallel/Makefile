@@ -1,6 +1,7 @@
-MPICC				= mpicc
+MPICC				= mpic++
 CFLAGS_MPI	= -O3 -Wall -c -Wunused-variable
 
+LDFLAGS			= -lm
 LDFLAGS_MPI	= $(LDFLAGS)
 
 EXEC_MPI		= mpi_ant_colony
