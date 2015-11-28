@@ -11,8 +11,8 @@
 
 int main(int argc, char* argv[]) {
 
-  if (argc != 7) {
-    printf("use : %s mapFile nbAnts nbIterations alpha beta evaporationCoeff\n", argv[0]);
+  if (argc != 8) {
+    printf("use : %s mapFile nbAnts nbExternalIterations nbOnNodeIterations alpha beta evaporationCoeff\n", argv[0]);
     return -1;
   }
 
@@ -36,10 +36,11 @@ int main(int argc, char* argv[]) {
 
   char* mapFile = argv[1];
   int nAnts = atoi(argv[2]);;
-  int iterations = atoi(argv[3]);
-  float alpha = atof(argv[4]);
-  float beta = atof(argv[5]);
-  float evaporationCoeff = atof(argv[6]);
+  int externalIterations = atoi(argv[3]);
+  int onNodeIteration = atoi(argv[4]);
+  float alpha = atof(argv[5]);
+  float beta = atof(argv[6]);
+  float evaporationCoeff = atof(argv[7]);
   int nCities = 0;
 
   if (prank == 0) {
@@ -74,7 +75,19 @@ int main(int argc, char* argv[]) {
     }
 
     printf("Number of cities : %d\n", nCities);
+
+    if (MPI_Bcast(&nCities, 1, MPI_INT, prank, MPI_COMM_WORLD) != MPI_SUCCESS) {
+      printf("SHIT ON MASTER\n");
+    }
+    printf("%d ended\n", prank);
+  } else {
+    if (MPI_Bcast(&nCities, 1, MPI_INT, prank, MPI_COMM_WORLD) != MPI_SUCCESS) {
+      printf("SHIT ON NODE %d\n", prank);
+    }
+    printf("%d ended\n", prank);
   }
+
+
 
   // TODO : send/recv the cities matrix
 
@@ -102,8 +115,9 @@ int main(int argc, char* argv[]) {
   // Between all external iterations : send BP to master
   // and send back the matrix
 
+  // For internal loops, need to send a message when stopping whole algorithm
   // External loop
-  while (loop_counter < iterations) {
+  /*while (loop_counter < externalIterations) {
 
     printf("Loop nr. : %d\n", loop_counter);
 
@@ -166,7 +180,7 @@ int main(int argc, char* argv[]) {
   }
   pheromons[bestPath[nCities-1]][bestPath[0]] = 1;
 
-
+  */
 
   // deallocation of the rows
   for(i=0; i<nCities ;i++) {
