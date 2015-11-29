@@ -12,7 +12,7 @@
 int main(int argc, char* argv[]) {
 
   if (argc != 8) {
-    printf("use : %s mapFile nbAnts nbExternalIterations nbOnNodeIterations alpha beta evaporationCoeff\n", argv[0]);
+    printf("use : %s mapFile nbAntsPerNode nbExternalIterations nbOnNodeIterations alpha beta evaporationCoeff\n", argv[0]);
     return -1;
   }
 
@@ -27,21 +27,49 @@ int main(int argc, char* argv[]) {
   int i, j, loop_counter, ant_counter, cities_counter;
   int **map = NULL;
   float **pheromons;
+  float **globalPheromons;
   // bestPath is a vector representing all cities in order.
   // If the value is 0, the city was not visited
   // else, the city is visited at step i
   int *bestPath;
+  int *otherBestPath;
   int *currentPath;
   int bestCost = INFTY;
 
   char* mapFile = argv[1];
-  int nAnts = atoi(argv[2]);;
-  int externalIterations = atoi(argv[3]);
-  int onNodeIteration = atoi(argv[4]);
-  float alpha = atof(argv[5]);
-  float beta = atof(argv[6]);
-  float evaporationCoeff = atof(argv[7]);
+  int nAnts; 
+  int externalIterations; 
+  int onNodeIteration; 
+  float alpha; 
+  float beta; 
+  float evaporationCoeff; 
   int nCities = 0;
+  int finish = 1;
+
+  if (prank == 0) {
+    mapFile = argv[1];
+    nAnts = atoi(argv[2]);;
+    externalIterations = atoi(argv[3]);
+    onNodeIteration = atoi(argv[4]);
+    alpha = atof(argv[5]);
+    beta = atof(argv[6]);
+    evaporationCoeff = atof(argv[7]);
+  }
+  if (MPI_Bcast(&nAnts, 1, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    return -1;
+  }
+  if (MPI_Bcast(&onNodeIteration, 1, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    return -1;
+  }
+  if (MPI_Bcast(&alpha, 1, MPI_FLOAT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    return -1;
+  }
+  if (MPI_Bcast(&beta, 1, MPI_FLOAT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    return -1;
+  }
+  if (MPI_Bcast(&evaporationCoeff, 1, MPI_FLOAT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    return -1;
+  }
 
   if (prank == 0) {
     // Load the map and the number of cities
@@ -57,13 +85,24 @@ int main(int argc, char* argv[]) {
     in >> out;
 
     // Define number of cities
-    nCities = atoi(out);
+    // // FIXME : +1 is correct ?
+    nCities = atoi(out) + 1;
 
-    // Allocation of map
+    // Allocation of local map and globalPheromons matrices and otherBestPath vector
+    otherBestPath = (int*) malloc(nCities*sizeof(int));
     map = (int**) malloc(nCities*sizeof(int*));
+    globalPheromons = (float**) malloc(nCities*sizeof(float*));
     for (i = 0; i < nCities; i++) {
       map[i] = (int*) malloc(nCities*sizeof(int));
+      globalPheromons[i] = (float*) malloc(nCities*sizeof(float));
+      otherBestPath[i] = -1;
+    }
 
+    for (i = 0; i < nCities; i++) {
+      for (j = i; j < nCities; j++) {
+        globalPheromons[i][j] = 0.1;
+        globalPheromons[j][i] = 0.1;
+      }
     }
 
     in.close();
@@ -75,21 +114,32 @@ int main(int argc, char* argv[]) {
     }
 
     printf("Number of cities : %d\n", nCities);
-
-    if (MPI_Bcast(&nCities, 1, MPI_INT, prank, MPI_COMM_WORLD) != MPI_SUCCESS) {
-      printf("SHIT ON MASTER\n");
-    }
-    printf("%d ended\n", prank);
-  } else {
-    if (MPI_Bcast(&nCities, 1, MPI_INT, prank, MPI_COMM_WORLD) != MPI_SUCCESS) {
-      printf("SHIT ON NODE %d\n", prank);
-    }
-    printf("%d ended\n", prank);
   }
 
+  // Share number of cities
+  if (MPI_Bcast(&nCities, 1, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    return -1;
+  }
 
+  printf("%d received %d cities\n", prank, nCities);
 
-  // TODO : send/recv the cities matrix
+  // Allocation of map for non-root nodes
+  if (prank != 0) {
+    map = (int**) malloc(nCities*sizeof(int*));
+    for (i = 0; i < nCities; i++) {
+      map[i] = (int*) malloc(nCities*sizeof(int));
+    }
+  }
+
+  // FIXME
+  if (MPI_Bcast(&map[0][0], nCities * nCities, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    return -1;
+  }
+
+  if (prank == 0) {
+    printf("Rank %d\n", prank);
+    //printMap(map, nCities);
+  }
 
   // Allocation of pheromons
   pheromons = (float**) malloc(nCities*sizeof(float*));
@@ -104,69 +154,89 @@ int main(int argc, char* argv[]) {
   for (i = 0; i < nCities; i++) {
     currentPath[i] = -1;
     bestPath[i] = -1;
-    for (j = 0; j < nCities; j++) {
+    for (j = i; j < nCities; j++) {
       pheromons[i][j] = 0.1;
+      pheromons[j][i] = 0.1;
     }
   }
 
-  loop_counter = 0;
+  /*
 
-  // TODO : add external and internal iterations
-  // Between all external iterations : send BP to master
-  // and send back the matrix
+     while (finish) {
+     loop_counter = 0;
+     while (loop_counter < onNodeIteration) {
 
-  // For internal loops, need to send a message when stopping whole algorithm
-  // External loop
-  /*while (loop_counter < externalIterations) {
-
-    printf("Loop nr. : %d\n", loop_counter);
+     printf("Loop nr. : %d in node %d\n", loop_counter, prank);
 
     // Loop over each ant
     for (ant_counter = 0; ant_counter < nAnts; ant_counter++) {
       // init currentPath 
       // -1 means not visited
       for (i = 0; i < nCities; i++) {
-        currentPath[i] = -1;
+      currentPath[i] = -1;
       }
 
-      // select a random start city for an ant
-      int currentCity = rand() % nCities;
-      // currentPath will contain the order of visited cities
-      currentPath[currentCity] = 0;
-      for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
-        // Find next city
-        currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta);
+    // select a random start city for an ant
+    int currentCity = rand() % nCities;
+    // currentPath will contain the order of visited cities
+    currentPath[currentCity] = 0;
+    for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
+      // Find next city
+      currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta);
 
-        if (currentCity == -1) {
-          printf("There is an error choosing the next city in interation %d fot ant %d\n", loop_counter, ant_counter);
-          return -1;
-        }
-
-        // add next city to plan
-        currentPath[currentCity] = cities_counter;
+      if (currentCity == -1) {
+      printf("There is an error choosing the next city in interation %d for ant %d on node %d\n", loop_counter, ant_counter, prank);
+      return -1;
       }
 
-      // update bestCost and bestPath
-      int oldCost = bestCost;
-      bestCost = updateBestPath(bestCost, bestPath, currentPath, map, nCities);
-
-      if (oldCost > bestCost) {
-        copyVector(currentPath, bestPath, nCities);
-      }
+    // add next city to plan
+    currentPath[currentCity] = cities_counter;
     }
-    //
-    // Pheromon evaporation
-    for (i = 0; i < nCities; i++) {
-      for (j = i + 1; j < nCities; j++) {
-        pheromons[i][j] *= evaporationCoeff;
-        pheromons[j][i] *= evaporationCoeff;
-      }
-    }
-    // Update pheromons
-    updatePheromons(pheromons, bestPath, bestCost, nCities);
 
-    loop_counter++;
-    printf("best cost : %d\n", bestCost);
+  // update bestCost and bestPath
+  int oldCost = bestCost;
+  bestCost = updateBestPath(bestCost, bestPath, currentPath, map, nCities);
+
+  if (oldCost > bestCost) {
+  copyVector(currentPath, bestPath, nCities);
+  }
+  }
+  //
+  // Pheromon evaporation
+  for (i = 0; i < nCities; i++) {
+  for (j = i + 1; j < nCities; j++) {
+  pheromons[i][j] *= evaporationCoeff;
+  pheromons[j][i] *= evaporationCoeff;
+  }
+  }
+  // Update pheromons
+  updatePheromons(pheromons, bestPath, bestCost, nCities);
+
+  loop_counter++;
+  printf("best cost on node %d : %d\n", prank, bestCost);
+  }
+
+    // TODO : 
+    // Merge part
+    if (prank != 0) {
+  // Send its bestPath's pheromons values
+  // MPI_Send()
+  }
+  if (prank == 0) {
+    // Recv pheromons values and merge them into globalPheromons
+    // MPI_Recv()
+    for (i = 0; i < nCities - 1; i++) {
+    globalPheromons[otherBestPath[i]][otherBestPath[i+1]] = 1;
+    }
+    globalPheromons[otherBestPath[nCities-1]][otherBestPath[0]] = 1;
+
+    }
+
+  // Send back to each node the complete matrix of pheromons
+  // MPI_Bcast()
+
+  // Merge updates pheromon's values into local pheromon matrix
+
   }
 
   if (prank == 0) {
@@ -174,27 +244,33 @@ int main(int argc, char* argv[]) {
     printf("best cost : %d\n", bestCost);
   }
 
-  // simulation of merge part
-  for (i = 0; i < nCities - 1; i++) {
-    pheromons[bestPath[i]][bestPath[i+1]] = 1;
+  if (prank == 0) {
+    // TODO :
+    // Free globalPheromones
+    // Free otherBestPath
   }
-  pheromons[bestPath[nCities-1]][bestPath[0]] = 1;
-
   */
 
-  // deallocation of the rows
+    // deallocation of the rows
+    printf("Caca\n");
   for(i=0; i<nCities ;i++) {
     free(map[i]);
     free(pheromons[i]);
   }
 
   // deallocate the pointers
+  printf("Caca\n");
   free(map);
+  printf("Caca\n");
   free(pheromons);
+  printf("Cacaaaaa\n");
   free(bestPath);
+  printf("Cacabbbb\n");
   free(currentPath);
+  printf("Cacacccc\n");
 
   MPI_Finalize();
+  printf("Cacadddd\n");
 
   return 0;
 }
