@@ -40,6 +40,11 @@ int main(int argc, char* argv[]) {
   float evaporationCoeff; 
   int nCities = 0;
 
+  // Start Timing
+  if (prank == 0) {
+    start = second();
+  }
+
   // Root reads args
   if (prank == 0) {
     mapFile = argv[1];
@@ -112,7 +117,7 @@ int main(int argc, char* argv[]) {
       return -1;
     }
 
-    printf("Number of cities : %d\n", nCities);
+    // printf("Number of cities : %d\n", nCities);
   }
 
   // Share number of cities
@@ -121,8 +126,6 @@ int main(int argc, char* argv[]) {
     MPI_Finalize();
     return -1;
   }
-
-  printf("%d received %d cities\n", prank, nCities);
 
   // Allocation of map for non-root nodes
   if (prank != 0) {
@@ -162,7 +165,7 @@ int main(int argc, char* argv[]) {
     loop_counter = 0;
     while (loop_counter < onNodeIteration) {
 
-      printf("Loop nr. : %d in node %d\n", loop_counter, prank);
+      // printf("Loop nr. : %d in node %d\n", loop_counter, prank);
 
       // Loop over each ant
       for (ant_counter = 0; ant_counter < nAnts; ant_counter++) {
@@ -236,7 +239,7 @@ int main(int argc, char* argv[]) {
     }
 
     external_loop_counter++;
-    printf("Node %d : external loop - %d\n", prank, external_loop_counter);
+    // printf("Node %d : external loop - %d\n", prank, external_loop_counter);
   }
 
   // Merge solution into root 
@@ -277,6 +280,11 @@ int main(int argc, char* argv[]) {
   free(bestPath);
   free(otherBestPath);
   free(currentPath);
+
+  if (prank == 0) {
+    end = second();
+    printf("TotalTime : %f\n", (end - start));
+  }
 
   MPI_Finalize();
 
