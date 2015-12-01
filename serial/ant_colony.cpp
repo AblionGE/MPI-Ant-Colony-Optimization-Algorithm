@@ -140,18 +140,10 @@ int main(int argc, char* argv[]) {
   }
 
   printPath(bestPath, nCities);
-  printf("best cost : %d\n", bestCost);
+  //printf("best cost : %d\n", bestCost);
 
   end = second();
   printf("Total time : %f\n", (end-start));
-
-  // simulation of merge part
-  for (i = 0; i < nCities - 1; i++) {
-    pheromons[bestPath[i]][bestPath[i+1]] = 1;
-  }
-  pheromons[bestPath[nCities-1]][bestPath[0]] = 1;
-
-
 
   // deallocation of the rows
   for(i=0; i<nCities ;i++) {

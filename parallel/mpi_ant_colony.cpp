@@ -266,10 +266,10 @@ int main(int argc, char* argv[]) {
   }
 
 
-  if (prank == 0) {
+  /*if (prank == 0) {
     printPath(bestPath, nCities);
     printf("best cost : %d\n", bestCost);
-  }
+  }*/
 
 
   // deallocate the pointers
