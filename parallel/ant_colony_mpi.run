@@ -10,7 +10,7 @@
 #SBATCH --mem 4096
 
 ## maximum walltime needed
-#SBATCH --time 00:02:00
+#SBATCH --time 00:10:00
 
 #SBATCH -p debug
 
@@ -18,4 +18,4 @@ module purge
 module load intel intelmpi
 module list
 
-srun ./mpi_ant_colony ../map1000.txt 1 10 10 1 1 0.9
+srun ./mpi_ant_colony ../map1000.txt 1 40 100 1 1 0.9
