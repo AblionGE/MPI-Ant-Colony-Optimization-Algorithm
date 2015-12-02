@@ -54,6 +54,9 @@ int main(int argc, char* argv[]) {
     alpha = atof(argv[5]);
     beta = atof(argv[6]);
     evaporationCoeff = atof(argv[7]);
+
+    printf("Iterations %d\n", externalIterations*onNodeIteration);
+    printf("Ants %d\n", nAnts);
   }
 
   // And then it shares values with other nodes
@@ -104,6 +107,8 @@ int main(int argc, char* argv[]) {
 
     // Define number of cities
     nCities = atoi(out);
+
+    printf("Cities %d\n", nCities);
 
     // Allocation of local map
     map = (int*) malloc(nCities*nCities*sizeof(int));

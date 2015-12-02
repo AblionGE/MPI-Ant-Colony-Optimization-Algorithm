@@ -1,13 +1,5 @@
 #include "utils.h"
 
-#ifndef max
-#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
-#endif
-
-#ifndef min
-#define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
-#endif
-
 int main(int argc, char* argv[]) {
 
   if (argc != 7) {
@@ -36,6 +28,9 @@ int main(int argc, char* argv[]) {
 
   start = second();
 
+  printf("Iterations %d\n", iterations);
+  printf("Ants %d\n", nAnts);
+
   // Load the map and the number of cities
   std::ifstream in;
   in.open(mapFile);
@@ -50,6 +45,8 @@ int main(int argc, char* argv[]) {
 
   // Define number of cities
   nCities = atoi(out);
+
+  printf("Cities %d\n", nCities);
 
   // Allocation of map
   map = (int**) malloc(nCities*sizeof(int*));
