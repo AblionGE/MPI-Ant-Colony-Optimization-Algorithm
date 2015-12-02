@@ -5,7 +5,7 @@
 int main(int argc, char* argv[]) {
 
   if (argc != 8) {
-    printf("use : %s mapFile nbAntsPerNode nbExternalIterations nbOnNodeIterations alpha beta evaporationCoeff\n", argv[0]);
+    printf("use : %s mapFile nbAnts nbExternalIterations nbOnNodeIterations alpha beta evaporationCoeff\n", argv[0]);
     return -1;
   }
 
@@ -39,11 +39,14 @@ int main(int argc, char* argv[]) {
   float beta; 
   float evaporationCoeff; 
   int nCities = 0;
+  int* nAntsPerNode;
 
   // Start Timing
   if (prank == 0) {
     start = second();
   }
+
+  nAntsPerNode = (int*) malloc(psize*sizeof(int));
 
   // Root reads args
   if (prank == 0) {
@@ -55,13 +58,23 @@ int main(int argc, char* argv[]) {
     beta = atof(argv[6]);
     evaporationCoeff = atof(argv[7]);
 
+    int antsPerNode = nAnts / psize;
+    int restAnts = nAnts % psize;
+
+    for (i = 0; i < psize; i++) {
+      nAntsPerNode[i] = antsPerNode;
+      if (restAnts > i) {
+        nAntsPerNode[i]++;
+      }
+    }
+
     printf("Iterations %d\n", externalIterations*onNodeIteration);
     printf("Ants %d\n", nAnts);
   }
 
   // And then it shares values with other nodes
-  if (MPI_Bcast(&nAnts, 1, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
-    printf("Node %d : Error in Broadcast of nAnts", prank);
+  if (MPI_Bcast(&nAntsPerNode[0], psize, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    printf("Node %d : Error in Broadcast of nAntsPerNode", prank);
     MPI_Finalize();
     return -1;
   }
@@ -165,6 +178,8 @@ int main(int argc, char* argv[]) {
   for (i = 0; i < nCities * nCities; i++) {
     pheromons[i] = 0.1;
   }
+
+  nAnts = nAntsPerNode[prank];
 
   while (external_loop_counter < externalIterations) {
     loop_counter = 0;
