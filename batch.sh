@@ -1,7 +1,7 @@
 #!/bin/bash
 
-ROOT="mpi_ant_colony"
-NB_ANTS=20
+ROOT="ant_colony"
+NB_ANTS=32
 NB_INTERNAL_LOOP=100
 NB_EXTERNAL_LOOP=40
 NB_TOTAL_LOOP=4000
@@ -10,7 +10,7 @@ BETA=1
 EVAPORATION=0.9
 
 ## Serial job
-SERIAL="$ROOT_Serial"
+SERIAL="serial_$ROOT.run"
 
 echo "#!/bin/bash" >> $SERIAL
 echo "#SBATCH --nodes 1" >> $SERIAL
@@ -26,7 +26,7 @@ sbatch $SERIAL
 ## Parallel jobs
 for i in 1 2 4 8 16
 do
-  FILE="$ROOT$i.run"
+  FILE="mpi_$ROOT$i.run"
   if [ -e $FILE ]; then
     rm $FILE
   fi
@@ -42,5 +42,3 @@ do
   echo "srun ./parallel/mpi_ant_colony ../map1000.txt $NB_ANTS $NB_EXTERNAL_LOOP $NB_INTERNAL_LOOP $ALPHA $BETA $EVAPORATION" >> $FILE
   sbatch $FILE
 done
-
-
