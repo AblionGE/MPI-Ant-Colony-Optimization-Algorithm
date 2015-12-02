@@ -1,10 +1,32 @@
 #!/bin/bash
 
-FILE="test.run"
+ROOT="mpi_ant_colony"
+NB_ANTS=20
+NB_INTERNAL_LOOP=100
+NB_EXTERNAL_LOOP=40
+NB_TOTAL_LOOP=4000
+ALPHA=1
+BETA=1
+EVAPORATION=0.9
+
+## Serial job
+SERIAL="$ROOT_Serial"
+
+echo "#!/bin/bash" >> $SERIAL
+echo "#SBATCH --nodes 1" >> $SERIAL
+echo "#SBATCH --ntasks-per-node 1" >> $SERIAL
+echo "#SBATCH --cpus-per-task 1" >> $SERIAL
+echo "#SBATCH --mem 4096" >> $SERIAL
+echo "#SBATCH --time 01:00:00" >> $SERIAL
+echo "module purge" >> $SERIAL
+echo "srun ./serial/serial_ant_colony ../map1000.txt $NB_ANTS $NB_TOTAL_LOOP $ALPHA $BETA $EVAPORATION" >> $SERIAL
+sbatch $SERIAL
+
 
 ## Parallel jobs
-for i in 1 2 4
+for i in 1 2 4 8 16
 do
+  FILE="$ROOT$i.run"
   if [ -e $FILE ]; then
     rm $FILE
   fi
@@ -17,9 +39,8 @@ do
   echo "#SBATCH --time 01:00:00" >> $FILE
   echo "module purge" >> $FILE
   echo "module load intel intelmpi" >> $FILE
-  echo "srun ./mpi_ant_colony ../map1000.txt 1 10 10 1 1 0.9" >> $FILE
+  echo "srun ./parallel/mpi_ant_colony ../map1000.txt $NB_ANTS $NB_EXTERNAL_LOOP $NB_INTERNAL_LOOP $ALPHA $BETA $EVAPORATION" >> $FILE
   sbatch $FILE
-  cat $FILE
 done
 
 
