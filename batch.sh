@@ -19,7 +19,7 @@ echo "#SBATCH --cpus-per-task 1" >> $SERIAL
 echo "#SBATCH --mem 4096" >> $SERIAL
 echo "#SBATCH --time 01:00:00" >> $SERIAL
 echo "module purge" >> $SERIAL
-echo "srun ./serial/serial_ant_colony ../map1000.txt $NB_ANTS $NB_TOTAL_LOOP $ALPHA $BETA $EVAPORATION" >> $SERIAL
+echo "srun ./serial/serial_ant_colony map1000.txt $NB_ANTS $NB_TOTAL_LOOP $ALPHA $BETA $EVAPORATION" >> $SERIAL
 sbatch $SERIAL
 
 
@@ -39,6 +39,6 @@ do
   echo "#SBATCH --time 01:00:00" >> $FILE
   echo "module purge" >> $FILE
   echo "module load intel intelmpi" >> $FILE
-  echo "srun ./parallel/mpi_ant_colony ../map1000.txt $NB_ANTS $NB_EXTERNAL_LOOP $NB_INTERNAL_LOOP $ALPHA $BETA $EVAPORATION" >> $FILE
+  echo "srun ./parallel/mpi_ant_colony map1000.txt $NB_ANTS $NB_EXTERNAL_LOOP $NB_INTERNAL_LOOP $ALPHA $BETA $EVAPORATION" >> $FILE
   sbatch $FILE
 done
