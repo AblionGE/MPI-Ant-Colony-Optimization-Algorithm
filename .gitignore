@@ -1,4 +1,3 @@
-Makefile
 *.txt
 *.xml
 
@@ -75,6 +74,8 @@ Makefile
 serial_ant_colony
 mpi_ant_colony
 generate_map
+generate_random_numbers
+Makefile
 *.swp
 */*.swp
 *.pdf
