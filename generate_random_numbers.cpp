@@ -3,6 +3,7 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#include <limits.h>
 
 
 int main(int argc, char* argv[]) {
@@ -21,7 +22,7 @@ int main(int argc, char* argv[]) {
   array = (int*) malloc(size*sizeof(int));
 
   for (i = 0; i < size; i++) {
-    array[i] = rand();
+    array[i] = (rand() % INT_MAX);
   }
 
   // Add the size as file first line
