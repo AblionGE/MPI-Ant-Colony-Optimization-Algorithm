@@ -2,13 +2,14 @@
 
 int main(int argc, char* argv[]) {
 
-  if (argc != 7) {
-    printf("use : %s mapFile nbAnts nbIterations alpha beta evaporationCoeff\n", argv[0]);
+  if (argc != 8) {
+    printf("use : %s mapFile randomNumberFile nbAnts nbIterations alpha beta evaporationCoeff\n", argv[0]);
     return -1;
   }
 
 
   int i, j, loop_counter, ant_counter, cities_counter;
+  int random_counter = 0;
   int **map = NULL;
   float **pheromons;
   // bestPath is a vector representing all cities in order.
@@ -17,14 +18,17 @@ int main(int argc, char* argv[]) {
   int *bestPath;
   int *currentPath;
   int bestCost = INFTY;
+  int* randomNumbers;
 
   char* mapFile = argv[1];
-  int nAnts = atoi(argv[2]);;
-  int iterations = atoi(argv[3]);
-  float alpha = atof(argv[4]);
-  float beta = atof(argv[5]);
-  float evaporationCoeff = atof(argv[6]);
+  char* randomFile = argv[2];
+  int nAnts = atoi(argv[3]);;
+  int iterations = atoi(argv[4]);
+  float alpha = atof(argv[5]);
+  float beta = atof(argv[6]);
+  float evaporationCoeff = atof(argv[7]);
   int nCities = 0;
+  int nRandomNumbers = 0;
 
   start = second();
 
@@ -40,7 +44,7 @@ int main(int argc, char* argv[]) {
     printf("The filepath %s is incorrect\n", mapFile);
     return -1;
   }
-  char out[8];
+  char out[12];
   in >> out;
 
   // Define number of cities
@@ -56,6 +60,30 @@ int main(int argc, char* argv[]) {
   }
 
   in.close();
+
+  // Read random number file
+  in.open(randomFile);
+
+  if (!in.is_open()) {
+    printf("Cannot open file.\n");
+    printf("The filepath %s is incorrect\n", randomFile);
+    return -1;
+  }
+
+  in >> out;
+
+  // Define number of random numbers
+  nRandomNumbers = atoi(out);
+
+  // Allocation of random numbers vectors
+  randomNumbers = (int*) malloc(nRandomNumbers*sizeof(int));
+
+  i = 0;
+  while (!in.eof()) {
+    in >> out;
+    randomNumbers[i] = atol(out);
+    i++;
+  }
 
   // Load the map inside map variable
   if (LoadCities(mapFile, map)) {
@@ -98,7 +126,8 @@ int main(int argc, char* argv[]) {
       }
 
       // select a random start city for an ant
-      int currentCity = rand() % nCities;
+      int currentCity = randomNumbers[random_counter]% nCities;
+      random_counter = (random_counter + 1) % nRandomNumbers;
       // currentPath will contain the order of visited cities
       currentPath[currentCity] = 0;
       for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
@@ -136,7 +165,7 @@ int main(int argc, char* argv[]) {
     loop_counter++;
   }
 
-  printPath(bestPath, nCities);
+  //printPath(bestPath, nCities);
   //printf("best cost : %d\n", bestCost);
 
   end = second();
