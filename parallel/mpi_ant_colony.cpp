@@ -4,8 +4,8 @@
 
 int main(int argc, char* argv[]) {
 
-  if (argc != 8) {
-    printf("use : %s mapFile nbAnts nbExternalIterations nbOnNodeIterations alpha beta evaporationCoeff\n", argv[0]);
+  if (argc != 9) {
+    printf("use : %s mapFile randomNumberFile nbAnts nbExternalIterations nbOnNodeIterations alpha beta evaporationCoeff\n", argv[0]);
     return -1;
   }
 
@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &psize);
 
   int i, j, loop_counter, ant_counter, cities_counter;
+  int random_counter = 0;
   int external_loop_counter = 0;
   int *map = NULL;
   float *pheromons;
@@ -31,7 +32,11 @@ int main(int argc, char* argv[]) {
   float* localPheromonsPath;
   float* otherPheromonsPath;
 
-  char* mapFile = argv[1];
+  int* randomNumbers;
+  int nRandomNumbers = 0;
+
+  char* mapFile;
+  char* randomFile;
   int nAnts; 
   int externalIterations; 
   int onNodeIteration; 
@@ -51,12 +56,13 @@ int main(int argc, char* argv[]) {
   // Root reads args
   if (prank == 0) {
     mapFile = argv[1];
-    nAnts = atoi(argv[2]);;
-    externalIterations = atoi(argv[3]);
-    onNodeIteration = atoi(argv[4]);
-    alpha = atof(argv[5]);
-    beta = atof(argv[6]);
-    evaporationCoeff = atof(argv[7]);
+    randomFile = argv[2];
+    nAnts = atoi(argv[3]);
+    externalIterations = atoi(argv[4]);
+    onNodeIteration = atoi(argv[5]);
+    alpha = atof(argv[6]);
+    beta = atof(argv[7]);
+    evaporationCoeff = atof(argv[8]);
 
     int antsPerNode = nAnts / psize;
     int restAnts = nAnts % psize;
@@ -115,7 +121,7 @@ int main(int argc, char* argv[]) {
       MPI_Finalize();
       return -1;
     }
-    char out[8];
+    char out[12];
     in >> out;
 
     // Define number of cities
@@ -127,6 +133,33 @@ int main(int argc, char* argv[]) {
     map = (int*) malloc(nCities*nCities*sizeof(int));
 
     in.close();
+
+    // Read random numbers file
+    in.open(randomFile);
+
+    if (!in.is_open()) {
+      printf("Cannot open file.\n");
+      printf("The filepath %s is incorrect\n", randomFile);
+      MPI_Finalize();
+      return -1;
+    }
+
+    in >> out;
+
+    // Define number of random numbers
+    nRandomNumbers = atoi(out);
+
+    // Allocation of random numbers vector
+    randomNumbers = (int*) malloc(nRandomNumbers*sizeof(int));
+
+    i = 0;
+    while(!in.eof()) {
+      in >> out;
+      randomNumbers[i] = atol[i];
+      i++;
+    }
+
+    // TODO : send number of random number per node + corresponding values in an array
 
     // Load the map inside map variable
     if (LoadCities(mapFile, map)) {
@@ -204,7 +237,8 @@ int main(int argc, char* argv[]) {
           currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta);
 
           if (currentCity == -1) {
-            printf("There is an error choosing the next city in interation %d for ant %d on node %d\n", loop_counter, ant_counter, prank);
+            printf("There is an error choosing the next city in iteration %d for ant %d on node %d\n", loop_counter, ant_counter, prank);
+            MPI_Finalize();
             return -1;
           }
 

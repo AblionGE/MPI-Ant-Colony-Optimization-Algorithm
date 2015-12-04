@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
   // Define number of random numbers
   nRandomNumbers = atoi(out);
 
-  // Allocation of random numbers vectors
+  // Allocation of random numbers vector
   randomNumbers = (int*) malloc(nRandomNumbers*sizeof(int));
 
   i = 0;
@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
         currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta);
 
         if (currentCity == -1) {
-          printf("There is an error choosing the next city in interation %d fot ant %d\n", loop_counter, ant_counter);
+          printf("There is an error choosing the next city in iteration %d fot ant %d\n", loop_counter, ant_counter);
           return -1;
         }
 
