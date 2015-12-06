@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
   float* localPheromonsPath;
   float* otherPheromonsPath;
 
-  int* randomNumbers;
+  long* randomNumbers;
   int nRandomNumbers = 0;
 
   char* mapFile;
@@ -46,6 +46,55 @@ int main(int argc, char* argv[]) {
   int nCities = 0;
   int* nAntsPerNode;
 
+  // share random file first
+  if (prank == 0) {
+    std::ifstream in;
+    randomFile = argv[2];
+    char out[20];
+
+    // Read random numbers file
+    in.open(randomFile);
+
+    if (!in.is_open()) {
+      printf("Cannot open file.\n");
+      printf("The filepath %s is incorrect\n", randomFile);
+      MPI_Finalize();
+      return -1;
+    }
+
+    in >> out;
+
+    // Define number of random numbers
+    nRandomNumbers = atol(out);
+
+    // Allocation of random numbers vector
+    randomNumbers = (long*) malloc(nRandomNumbers*sizeof(long));
+
+    i = 0;
+    while(!in.eof()) {
+      in >> out;
+      randomNumbers[i] = atol(out);
+      i++;
+    }
+
+  }
+
+  if (MPI_Bcast(&nRandomNumbers, 1, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    printf("Node %d : Error in Broadcast of nRandomNumbers", prank);
+    MPI_Finalize();
+    return -1;
+  }
+
+  if (prank != 0) {
+    randomNumbers = (long*) malloc(nRandomNumbers*sizeof(long));
+  }
+
+  if (MPI_Bcast(&randomNumbers[0], nRandomNumbers, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    printf("Node %d : Error in Broadcast of randomNumbers", prank);
+    MPI_Finalize();
+    return -1;
+  }
+
   // Start Timing
   if (prank == 0) {
     start = second();
@@ -56,7 +105,6 @@ int main(int argc, char* argv[]) {
   // Root reads args
   if (prank == 0) {
     mapFile = argv[1];
-    randomFile = argv[2];
     nAnts = atoi(argv[3]);
     externalIterations = atoi(argv[4]);
     onNodeIteration = atoi(argv[5]);
@@ -134,33 +182,6 @@ int main(int argc, char* argv[]) {
 
     in.close();
 
-    // Read random numbers file
-    in.open(randomFile);
-
-    if (!in.is_open()) {
-      printf("Cannot open file.\n");
-      printf("The filepath %s is incorrect\n", randomFile);
-      MPI_Finalize();
-      return -1;
-    }
-
-    in >> out;
-
-    // Define number of random numbers
-    nRandomNumbers = atoi(out);
-
-    // Allocation of random numbers vector
-    randomNumbers = (int*) malloc(nRandomNumbers*sizeof(int));
-
-    i = 0;
-    while(!in.eof()) {
-      in >> out;
-      randomNumbers[i] = atol[i];
-      i++;
-    }
-
-    // TODO : send number of random number per node + corresponding values in an array
-
     // Load the map inside map variable
     if (LoadCities(mapFile, map)) {
       printf("The filepath %s is incorrect\n", mapFile);
@@ -214,6 +235,8 @@ int main(int argc, char* argv[]) {
 
   nAnts = nAntsPerNode[prank];
 
+  random_counter = (random_counter + (onNodeIteration * prank)) % nRandomNumbers;
+
   while (external_loop_counter < externalIterations) {
     loop_counter = 0;
     while (loop_counter < onNodeIteration) {
@@ -229,7 +252,9 @@ int main(int argc, char* argv[]) {
         }
 
         // select a random start city for an ant
-        int currentCity = rand() % nCities;
+        long rand = randomNumbers[random_counter];
+        int currentCity = rand % nCities;
+        random_counter = (random_counter + 1) % nRandomNumbers;
         // currentPath will contain the order of visited cities
         currentPath[currentCity] = 0;
         for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
@@ -294,6 +319,8 @@ int main(int argc, char* argv[]) {
 
     external_loop_counter++;
     // printf("Node %d : external loop - %d\n", prank, external_loop_counter);
+
+    random_counter = (random_counter + (onNodeIteration * (psize - 1))) % nRandomNumbers;
   }
 
   // Merge solution into root 
@@ -320,10 +347,11 @@ int main(int argc, char* argv[]) {
   }
 
 
-  /*if (prank == 0) {
-    printPath(bestPath, nCities);
-    printf("best cost : %d\n", bestCost);
-  }*/
+  /*  if (prank == 0) {
+  // printPath(bestPath, nCities);
+  printf("best cost : %d\n", bestCost);
+  }
+  */
 
 
   // deallocate the pointers
