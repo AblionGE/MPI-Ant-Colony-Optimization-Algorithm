@@ -71,11 +71,13 @@ int main(int argc, char* argv[]) {
     randomNumbers = (long*) malloc(nRandomNumbers*sizeof(long));
 
     i = 0;
-    while(!in.eof()) {
+    for (i = 0; i < nRandomNumbers; i++) {
+//    while(!in.eof()) {
       in >> out;
       randomNumbers[i] = atol(out);
-      i++;
     }
+
+    in.close();
 
   }
 

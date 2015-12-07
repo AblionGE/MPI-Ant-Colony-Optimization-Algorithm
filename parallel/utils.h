@@ -125,6 +125,11 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
     }
   }
 
+  if (total == 0) {
+    total = 1;
+    probabilities[rand() % nCities] = 1;
+  }
+
   for (i = 0; i < nCities; i++) {
     probabilities[i] = probabilities[i] / total;
   }
