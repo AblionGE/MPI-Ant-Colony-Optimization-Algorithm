@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
   int external_loop_counter = 0;
   int *map = NULL;
   float *pheromons;
+  int* pheromonsUpdate;
   // bestPath is a vector representing all cities in order.
   // If the value is 0, the city was not visited
   // else, the city is visited at step i
@@ -222,6 +223,7 @@ int main(int argc, char* argv[]) {
 
     // Allocation of pheromons
     pheromons = (float*) malloc(nCities*nCities*sizeof(float));
+    pheromonsUpdate = (int*) malloc(nCities*nCities*sizeof(int));
     localPheromonsPath = (float*) malloc(nCities*sizeof(float));
 
     otherBestPath = (int*) malloc(nCities*sizeof(int));
@@ -309,6 +311,10 @@ int main(int argc, char* argv[]) {
       }
 
       findPheromonsPath(localPheromonsPath, bestPath, pheromons, nCities);
+
+      for (j = 0; j < nCities*nCities; j++) {
+        pheromonsUpdate[j] = 1;
+      }
       int tempBestCost = bestCost;
       int* tempBestPath = (int*) malloc(nCities * sizeof(int));
       int tempTerminationCondition = terminationCondition;
@@ -351,12 +357,20 @@ int main(int argc, char* argv[]) {
           }
 
           for (j = 0; j < nCities - 1; j++) {
-            pheromons[getMatrixIndex(otherBestPath[i],otherBestPath[i+1],nCities)] += otherPheromonsPath[i];
-            pheromons[getMatrixIndex(otherBestPath[i+1],otherBestPath[i],nCities)] += otherPheromonsPath[i];
+            pheromonsUpdate[getMatrixIndex(otherBestPath[j],otherBestPath[j+1],nCities)] += 1;
+            pheromonsUpdate[getMatrixIndex(otherBestPath[j+1],otherBestPath[j],nCities)] += 1;
+            pheromons[getMatrixIndex(otherBestPath[j],otherBestPath[j+1],nCities)] += otherPheromonsPath[j];
+            pheromons[getMatrixIndex(otherBestPath[j+1],otherBestPath[j],nCities)] += otherPheromonsPath[j];
           }
+          pheromonsUpdate[getMatrixIndex(otherBestPath[nCities-1],otherBestPath[0],nCities)] += 1;
+          pheromonsUpdate[getMatrixIndex(otherBestPath[0],otherBestPath[nCities-1],nCities)] += 1;
           pheromons[getMatrixIndex(otherBestPath[nCities-1],otherBestPath[0],nCities)] += otherPheromonsPath[nCities - 1];
           pheromons[getMatrixIndex(otherBestPath[0],otherBestPath[nCities-1],nCities)] += otherPheromonsPath[nCities - 1];
         }
+      }
+      
+      for (j = 0; j < nCities*nCities; j++) {
+        pheromons[j] = pheromons[j] / pheromonsUpdate[j];
       }
 
       bestCost = tempBestCost;
@@ -369,8 +383,6 @@ int main(int argc, char* argv[]) {
       // 2 times because we used twice a random number
       random_counter = (random_counter + (2 * onNodeIteration * (psize - 1))) % nRandomNumbers;
     }
-
-    printf("TerminationCondition %d\n", terminationCondition);
 
     // Merge solution into root 
     if (prank == 0) {
