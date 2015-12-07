@@ -11,9 +11,12 @@
 #include <fstream>
 
 #define INFTY 999999999
-#define eps 0.005
 
 double start, end;
+
+int getMatrixIndex(int i, int j, int matrixSize) {
+  return (i * matrixSize) + j;
+}
 
 void printPath(int* path, int nCities) {
   int i;
@@ -28,28 +31,47 @@ void printPath(int* path, int nCities) {
   printf("\n");
 }
 
-void printMap(int** map, int nCities) {
+void printMap(int* map, int nCities) {
   printf("\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   printf("MAP :\n");
-  int i, j;
-  for (i = 0; i < nCities; i++) {
-    for (j = 0; j < nCities; j++) {
-      printf("%d ", map[i][j]);
+  int i;
+  for (i = 0; i < nCities * nCities; i++) {
+    printf("%d ", map[i]);
+    if (i % nCities == (nCities - 1)) {
+      printf("\n");
     }
-    printf("\n");
   }
   printf("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
 }
 
-void copyVector(int* in, int* out, int size) {
+void copyVectorInt(int* in, int* out, int size) {
   int k;
   for (k = 0; k < size; k++) {
-    out[k] = in[k];
+    out[k] = (int) in[k];
   }
 }
 
+void copyVectorFloat(float* in, float* out, int size) {
+  int k;
+  for (k = 0; k < size; k++) {
+    out[k] = (float) in[k];
+  }
+}
 
-int LoadCities(char* file, int** map) {
+void findPheromonsPath (float* pheromonsPath, int* bestPath, float* pheromons, int nCities) {
+  int i;
+  int previousCity = 0;
+  int nextCity = 0;
+  for (i = 1; i < nCities; i++) {
+    previousCity = bestPath[i - 1];
+    nextCity = bestPath[i];
+    pheromonsPath[i-1] = pheromons[getMatrixIndex(previousCity, nextCity, nCities)];
+  }
+  // Add end of loop
+  pheromonsPath[nCities - 1] = pheromons[getMatrixIndex(nextCity, bestPath[0], nCities)];
+}
+
+int LoadCities(char* file, int* map) {
   std::ifstream in;
   int matrixFull = 1;
   int size = 0;
@@ -71,7 +93,8 @@ int LoadCities(char* file, int** map) {
       size = atoi(out);
     } else {
       in >> out;
-      map[x][y] = atoi(out);
+      int index = getMatrixIndex(x,y,size);
+      map[index]= atoi(out);
       y = (y + 1) % size;
       if (y == 0) {
         x = (x + 1) % size;
@@ -89,17 +112,26 @@ int LoadCities(char* file, int** map) {
   return 0;
 }
 
-void computeProbabilities(int currentCity, double* probabilities, int* path, int** map, int nCities, float** pheromons, float alpha, float beta) {
+void computeProbabilities(int currentCity, double* probabilities, int* path, int* map, int nCities, float* pheromons, float alpha, float beta) {
   int i;
+  int random = (rand() % nCities);
   double total = 0;
   for (i = 0; i < nCities; i++) {
     if (path[i] != -1 || i == currentCity) {
       probabilities[i] = 0;
     } else {
-      double p = pow((1.0 / map[currentCity][i]),alpha) * pow(pheromons[currentCity][i], beta);
+      double p = pow(1.0 / map[getMatrixIndex(currentCity,i,nCities)],alpha) * pow(pheromons[getMatrixIndex(currentCity,i,nCities)], beta);
       probabilities[i] = p;
       total += p;
     }
+  }
+
+  if (total == 0) {
+    total = 1;
+    while (path[random] != -1 || random == currentCity) {
+      random = (rand() % nCities);
+    }
+    probabilities[random] = 1;
   }
 
   for (i = 0; i < nCities; i++) {
@@ -107,13 +139,13 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
   }
 }
 
-int computeNextCity(int currentCity, int* path, int** map, int nCities, float** pheromons, float alpha, float beta) {
+int computeNextCity(int currentCity, int* path, int* map, int nCities, float* pheromons, float alpha, float beta) {
   int i = 0;
   double *probabilities;
   probabilities = (double*) malloc(nCities*sizeof(double));
   computeProbabilities(currentCity, probabilities, path, map, nCities, pheromons, alpha, beta);
 
-  int value = rand() % 100 + 1;
+  int value = (rand() % 100) + 1;
   int sum = 0;
 
   for (i = 0; i < nCities; i++) {
@@ -127,7 +159,7 @@ int computeNextCity(int currentCity, int* path, int** map, int nCities, float** 
   return -1;
 }
 
-int updateBestPath(int bestCost, int* bestPath, int* currentPath, int** map, int nCities) {
+int updateBestPath(int bestCost, int* bestPath, int* currentPath, int* map, int nCities) {
   // compute currentCost
   int i;
   int currentCost = 0;
@@ -136,12 +168,11 @@ int updateBestPath(int bestCost, int* bestPath, int* currentPath, int** map, int
   for (i = 0; i < nCities; i++) {
     orderedCities[currentPath[i]] = i;
   }
-
   for (i = 0; i < nCities - 1; i++) {
-    currentCost += map[orderedCities[i]][orderedCities[i + 1]];
+    currentCost += map[getMatrixIndex(orderedCities[i],orderedCities[i + 1], nCities)];
   }
   // add last
-  currentCost += map[orderedCities[nCities - 1]][orderedCities[0]];
+  currentCost += map[getMatrixIndex(orderedCities[nCities - 1], orderedCities[0], nCities)];
 
   if (bestCost > currentCost) {
     return currentCost;
@@ -150,8 +181,7 @@ int updateBestPath(int bestCost, int* bestPath, int* currentPath, int** map, int
   }
 }
 
-// TODO : Formula for updating pheromons
-void updatePheromons(float** pheromons, int* path, int cost, int nCities) {
+void updatePheromons(float* pheromons, int* path, int cost, int nCities) {
   int i;
   int* orderedCities = (int*) malloc(nCities*sizeof(int));
 
@@ -161,12 +191,12 @@ void updatePheromons(float** pheromons, int* path, int cost, int nCities) {
   }
 
   for (i = 0; i < nCities - 1; i++) {
-    pheromons[orderedCities[i]][orderedCities[i + 1]] += 1/cost;
-    pheromons[orderedCities[i + 1]][orderedCities[i]] += 1/cost;
+    pheromons[getMatrixIndex(orderedCities[i],orderedCities[i + 1], nCities)] += 1/cost;
+    pheromons[getMatrixIndex(orderedCities[i + 1],orderedCities[i], nCities)] += 1/cost;
   }
   // add last
-  pheromons[orderedCities[nCities - 1]][0] += 1/cost;
-  pheromons[orderedCities[0]][nCities - 1] += 1/cost;
+  pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] += 1/cost;
+  pheromons[getMatrixIndex(orderedCities[0],orderedCities[nCities - 1], nCities)] += 1/cost;
 }
 
 #if __linux__ 

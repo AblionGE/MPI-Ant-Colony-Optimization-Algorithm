@@ -10,8 +10,8 @@ int main(int argc, char* argv[]) {
 
   int i, j, loop_counter, ant_counter, cities_counter;
   int random_counter = 0;
-  int **map = NULL;
-  float **pheromons;
+  int *map = NULL;
+  float *pheromons;
   // bestPath is a vector representing all cities in order.
   // If the value is 0, the city was not visited
   // else, the city is visited at step i
@@ -53,11 +53,7 @@ int main(int argc, char* argv[]) {
   printf("Cities %d\n", nCities);
 
   // Allocation of map
-  map = (int**) malloc(nCities*sizeof(int*));
-  for (i = 0; i < nCities; i++) {
-    map[i] = (int*) malloc(nCities*sizeof(int));
-
-  }
+  map = (int*) malloc(nCities*nCities*sizeof(int));
 
   in.close();
 
@@ -93,11 +89,8 @@ int main(int argc, char* argv[]) {
 
 
   // Allocation of pheromons
-  pheromons = (float**) malloc(nCities*sizeof(float*));
+  pheromons = (float*) malloc(nCities*nCities*sizeof(float));
 
-  for (i = 0; i < nCities; i++) {
-    pheromons[i] = (float*) malloc(nCities*sizeof(float));
-  }
   bestPath = (int*) malloc(nCities*sizeof(int));
   currentPath = (int*) malloc(nCities*sizeof(int));
 
@@ -106,7 +99,7 @@ int main(int argc, char* argv[]) {
     currentPath[i] = -1;
     bestPath[i] = -1;
     for (j = 0; j < nCities; j++) {
-      pheromons[i][j] = 0.1;
+      pheromons[getMatrixIndex(i,j,nCities)] = 0.1;
     }
   }
 
@@ -148,15 +141,15 @@ int main(int argc, char* argv[]) {
       bestCost = updateBestPath(bestCost, bestPath, currentPath, map, nCities);
 
       if (oldCost > bestCost) {
-        copyVector(currentPath, bestPath, nCities);
+        copyVectorInt(currentPath, bestPath, nCities);
       }
     }
     //
     // Pheromon evaporation
     for (i = 0; i < nCities; i++) {
       for (j = i + 1; j < nCities; j++) {
-        pheromons[i][j] *= evaporationCoeff;
-        pheromons[j][i] *= evaporationCoeff;
+        pheromons[getMatrixIndex(i,j,nCities)] *= evaporationCoeff;
+        pheromons[getMatrixIndex(j,i,nCities)] *= evaporationCoeff;
       }
     }
     // Update pheromons
@@ -170,12 +163,6 @@ int main(int argc, char* argv[]) {
 
   end = second();
   printf("Total time : %f\n", (end-start));
-
-  // deallocation of the rows
-  for(i=0; i<nCities ;i++) {
-    free(map[i]);
-    free(pheromons[i]);
-  }
 
   // deallocate the pointers
   free(map);
