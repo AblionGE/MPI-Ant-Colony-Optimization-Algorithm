@@ -128,12 +128,13 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
   // If all the probabilities are really small
   // We select one (not randomly to have always the same behavior)
   if (total == 0) {
-    total = 1;
     i = 0;
-    while (path[i] != -1 || i == currentCity) {
-      i++;
+    for (i = 0; i < nCities; i++) {
+      if (path[i] == -1 && i != currentCity) {
+        probabilities[i] = 1;
+        total++;
+      }
     }
-    probabilities[i] = 1;
   }
 
   for (i = 0; i < nCities; i++) {
