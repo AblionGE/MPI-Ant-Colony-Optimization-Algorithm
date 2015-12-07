@@ -114,6 +114,7 @@ int LoadCities(char* file, int* map) {
 
 void computeProbabilities(int currentCity, double* probabilities, int* path, int* map, int nCities, float* pheromons, float alpha, float beta) {
   int i;
+  int random = (rand() % nCities);
   double total = 0;
   for (i = 0; i < nCities; i++) {
     if (path[i] != -1 || i == currentCity) {
@@ -127,7 +128,10 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
 
   if (total == 0) {
     total = 1;
-    probabilities[rand() % nCities] = 1;
+    while (path[random] != -1 || random == currentCity) {
+      random = (rand() % nCities);
+    }
+    probabilities[random] = 1;
   }
 
   for (i = 0; i < nCities; i++) {
@@ -141,7 +145,7 @@ int computeNextCity(int currentCity, int* path, int* map, int nCities, float* ph
   probabilities = (double*) malloc(nCities*sizeof(double));
   computeProbabilities(currentCity, probabilities, path, map, nCities, pheromons, alpha, beta);
 
-  int value = rand() % 100 + 1;
+  int value = (rand() % 100) + 1;
   int sum = 0;
 
   for (i = 0; i < nCities; i++) {
@@ -164,7 +168,6 @@ int updateBestPath(int bestCost, int* bestPath, int* currentPath, int* map, int 
   for (i = 0; i < nCities; i++) {
     orderedCities[currentPath[i]] = i;
   }
-
   for (i = 0; i < nCities - 1; i++) {
     currentCost += map[getMatrixIndex(orderedCities[i],orderedCities[i + 1], nCities)];
   }
@@ -178,7 +181,6 @@ int updateBestPath(int bestCost, int* bestPath, int* currentPath, int* map, int 
   }
 }
 
-// TODO : Formula for updating pheromons
 void updatePheromons(float* pheromons, int* path, int cost, int nCities) {
   int i;
   int* orderedCities = (int*) malloc(nCities*sizeof(int));
@@ -193,8 +195,8 @@ void updatePheromons(float* pheromons, int* path, int cost, int nCities) {
     pheromons[getMatrixIndex(orderedCities[i + 1],orderedCities[i], nCities)] += 1/cost;
   }
   // add last
-  pheromons[getMatrixIndex(orderedCities[nCities - 1],0,nCities)] += 1/cost;
-  pheromons[getMatrixIndex(orderedCities[0],nCities - 1, nCities)] += 1/cost;
+  pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] += 1/cost;
+  pheromons[getMatrixIndex(orderedCities[0],orderedCities[nCities - 1], nCities)] += 1/cost;
 }
 
 #if __linux__ 

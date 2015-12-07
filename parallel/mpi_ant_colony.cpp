@@ -281,7 +281,7 @@ int main(int argc, char* argv[]) {
           copyVectorInt(currentPath, bestPath, nCities);
         }
       }
-
+      
       // Pheromon evaporation
       for (i = 0; i < nCities * nCities; i++) {
         pheromons[i] *= evaporationCoeff;
@@ -320,7 +320,7 @@ int main(int argc, char* argv[]) {
     }
 
     external_loop_counter++;
-    // printf("Node %d : external loop - %d\n", prank, external_loop_counter);
+    printf("Node %d : external loop - %d\n", prank, external_loop_counter);
 
     random_counter = (random_counter + (onNodeIteration * (psize - 1))) % nRandomNumbers;
   }
@@ -349,14 +349,18 @@ int main(int argc, char* argv[]) {
   }
 
 
-  /*  if (prank == 0) {
-  // printPath(bestPath, nCities);
-  printf("best cost : %d\n", bestCost);
-  }
-  */
+  /*if (prank == 0) {
+   printPath(bestPath, nCities);
+   printf("best cost : %d\n", bestCost);
+  }*/
 
+  if (prank == 0) {
+    end = second();
+    printf("TotalTime : %f\n", (end - start));
+  }
 
   // deallocate the pointers
+  free(randomNumbers);
   free(map);
   free(pheromons);
   free(localPheromonsPath);
@@ -364,11 +368,6 @@ int main(int argc, char* argv[]) {
   free(bestPath);
   free(otherBestPath);
   free(currentPath);
-
-  if (prank == 0) {
-    end = second();
-    printf("TotalTime : %f\n", (end - start));
-  }
 
   MPI_Finalize();
 
