@@ -114,7 +114,6 @@ int LoadCities(char* file, int* map) {
 
 void computeProbabilities(int currentCity, double* probabilities, int* path, int* map, int nCities, float* pheromons, float alpha, float beta) {
   int i;
-  int random = (rand() % nCities);
   double total = 0;
   for (i = 0; i < nCities; i++) {
     if (path[i] != -1 || i == currentCity) {
@@ -126,12 +125,15 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
     }
   }
 
+  // If all the probabilities are really small
+  // We select one (not randomly to have always the same behavior)
   if (total == 0) {
     total = 1;
-    while (path[random] != -1 || random == currentCity) {
-      random = (rand() % nCities);
+    i = 0;
+    while (path[i] != -1 || i == currentCity) {
+      i++;
     }
-    probabilities[random] = 1;
+    probabilities[i] = 1;
   }
 
   for (i = 0; i < nCities; i++) {
@@ -139,13 +141,13 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
   }
 }
 
-int computeNextCity(int currentCity, int* path, int* map, int nCities, float* pheromons, float alpha, float beta) {
+int computeNextCity(int currentCity, int* path, int* map, int nCities, float* pheromons, float alpha, float beta, long random) {
   int i = 0;
   double *probabilities;
   probabilities = (double*) malloc(nCities*sizeof(double));
   computeProbabilities(currentCity, probabilities, path, map, nCities, pheromons, alpha, beta);
 
-  int value = (rand() % 100) + 1;
+  int value = (random % 100) + 1;
   int sum = 0;
 
   for (i = 0; i < nCities; i++) {

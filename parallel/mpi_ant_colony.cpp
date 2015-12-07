@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
   int *otherBestPath;
   int *currentPath;
   int bestCost = INFTY;
+  int previousIterationCost = INFTY;
   int otherBestCost;
   float* localPheromonsPath;
   float* otherPheromonsPath;
@@ -48,6 +49,7 @@ int main(int argc, char* argv[]) {
   int* nAntsPerNode;
   int terminationCondition = 0;
   int otherTerminationCondition = 0;
+  float terminationConditionPercentage = 0.5;
 
   // share random file first
   if (prank == 0) {
@@ -74,15 +76,14 @@ int main(int argc, char* argv[]) {
     randomNumbers = (long*) malloc(nRandomNumbers*sizeof(long));
 
     i = 0;
-    for (i = 0; i < nRandomNumbers; i++) {
-      //    while(!in.eof()) {
+    while(!in.eof()) {
       in >> out;
       randomNumbers[i] = atol(out);
     }
 
     in.close();
 
-    }
+  }
 
     if (MPI_Bcast(&nRandomNumbers, 1, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
       printf("Node %d : Error in Broadcast of nRandomNumbers", prank);
@@ -92,6 +93,9 @@ int main(int argc, char* argv[]) {
 
     if (prank != 0) {
       randomNumbers = (long*) malloc(nRandomNumbers*sizeof(long));
+      for (i = 0; i < nRandomNumbers; i++) {
+        randomNumbers[i] = 0;
+      }
     }
 
     if (MPI_Bcast(&randomNumbers[0], nRandomNumbers, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
@@ -242,7 +246,7 @@ int main(int argc, char* argv[]) {
 
     random_counter = (random_counter + (onNodeIteration * prank)) % nRandomNumbers;
 
-    while (external_loop_counter < externalIterations && terminationCondition < ceilf(external_loop_counter * onNodeIteration * 0.8)) {
+    while (external_loop_counter < externalIterations && terminationCondition < (int) ceilf(externalIterations * onNodeIteration * terminationConditionPercentage)) {
       loop_counter = 0;
       while (loop_counter < onNodeIteration) {
 
@@ -264,7 +268,9 @@ int main(int argc, char* argv[]) {
           currentPath[currentCity] = 0;
           for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
             // Find next city
-            currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta);
+            rand = randomNumbers[random_counter];
+            currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, rand);
+            random_counter = (random_counter + 1) % nRandomNumbers;
 
             if (currentCity == -1) {
               printf("There is an error choosing the next city in iteration %d for ant %d on node %d\n", loop_counter, ant_counter, prank);
@@ -282,9 +288,6 @@ int main(int argc, char* argv[]) {
 
           if (oldCost > bestCost) {
             copyVectorInt(currentPath, bestPath, nCities);
-            terminationCondition = 0;
-          } else {
-            terminationCondition++;
           }
         }
 
@@ -295,15 +298,27 @@ int main(int argc, char* argv[]) {
         // Update pheromons
         updatePheromons(pheromons, bestPath, bestCost, nCities);
 
+        if (previousIterationCost > bestCost) {
+          previousIterationCost = bestCost;
+          terminationCondition = 0;
+        } else {
+          terminationCondition++;
+        }
+
         loop_counter++;
       }
 
       findPheromonsPath(localPheromonsPath, bestPath, pheromons, nCities);
+      int tempBestCost = bestCost;
+      int* tempBestPath = (int*) malloc(nCities * sizeof(int));
+      int tempTerminationCondition = terminationCondition;
+      copyVectorInt(bestPath, tempBestPath, nCities);
       for (i = 0; i < psize; i++) {
         if (prank == i) {
           copyVectorInt(bestPath, otherBestPath, nCities);
           copyVectorFloat(localPheromonsPath, otherPheromonsPath, nCities);
           otherTerminationCondition = terminationCondition;
+          otherBestCost = bestCost;
         }
         if (MPI_Bcast(&otherBestPath[0], nCities, MPI_INT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
           printf("Node %d : Error in Broadcast of otherBestPath", prank);
@@ -320,15 +335,19 @@ int main(int argc, char* argv[]) {
           MPI_Finalize();
           return -1;
         }
+        if (MPI_Bcast(&otherBestCost, 1, MPI_INT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
+          printf("Node %d : Error in Broadcast of otherTerminationCondition", prank);
+          MPI_Finalize();
+          return -1;
+        }
 
         if (prank != i) {
-          otherBestCost = updateBestPath(bestCost, bestPath, otherBestPath, map, nCities);
-          if (otherBestCost < bestCost) {
-            terminationCondition = otherTerminationCondition;
-            bestCost = otherBestCost;
-            copyVectorInt(otherBestPath, bestPath,  nCities);
-          } else if (otherBestCost == bestCost) {
-            terminationCondition += otherTerminationCondition;
+          if (otherBestCost < tempBestCost) {
+            tempTerminationCondition = otherTerminationCondition;
+            tempBestCost = otherBestCost;
+            copyVectorInt(otherBestPath, tempBestPath,  nCities);
+          } else if (otherBestCost == tempBestCost) {
+            tempTerminationCondition += otherTerminationCondition;
           }
 
           for (j = 0; j < nCities - 1; j++) {
@@ -340,11 +359,18 @@ int main(int argc, char* argv[]) {
         }
       }
 
-      external_loop_counter++;
-      // printf("Node %d : external loop - %d\n", prank, external_loop_counter);
+      bestCost = tempBestCost;
+      copyVectorInt(tempBestPath, bestPath, nCities);
+      terminationCondition = tempTerminationCondition;
 
-      random_counter = (random_counter + (onNodeIteration * (psize - 1))) % nRandomNumbers;
+
+      external_loop_counter++;
+
+      // 2 times because we used twice a random number
+      random_counter = (random_counter + (2 * onNodeIteration * (psize - 1))) % nRandomNumbers;
     }
+
+    printf("TerminationCondition %d\n", terminationCondition);
 
     // Merge solution into root 
     if (prank == 0) {
@@ -370,10 +396,10 @@ int main(int argc, char* argv[]) {
     }
 
 
-    /*if (prank == 0) {
-      printPath(bestPath, nCities);
+    if (prank == 0) {
+      // printPath(bestPath, nCities);
       printf("best cost : %d\n", bestCost);
-      }*/
+    }
 
     if (prank == 0) {
       end = second();

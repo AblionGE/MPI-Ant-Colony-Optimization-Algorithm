@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
   int *bestPath;
   int *currentPath;
   int bestCost = INFTY;
+  int previousIterationCost = INFTY;
   int* randomNumbers;
 
   char* mapFile = argv[1];
@@ -30,6 +31,7 @@ int main(int argc, char* argv[]) {
   int nCities = 0;
   int nRandomNumbers = 0;
   int terminationCondition = 0;
+  float terminationConditionPercentage = 0.5;
 
   start = second();
 
@@ -107,7 +109,7 @@ int main(int argc, char* argv[]) {
   loop_counter = 0;
 
   // External loop
-  while (loop_counter < iterations && terminationCondition < ceilf(iterations * 0.2)) {
+  while (loop_counter < iterations && terminationCondition < ceilf(iterations * terminationConditionPercentage)) {
 
     // printf("Loop nr. : %d\n", loop_counter);
 
@@ -120,13 +122,15 @@ int main(int argc, char* argv[]) {
       }
 
       // select a random start city for an ant
-      int currentCity = randomNumbers[random_counter]% nCities;
+      int currentCity = randomNumbers[random_counter] % nCities;
       random_counter = (random_counter + 1) % nRandomNumbers;
       // currentPath will contain the order of visited cities
       currentPath[currentCity] = 0;
       for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
         // Find next city
-        currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta);
+        currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, randomNumbers[random_counter]);
+        random_counter = (random_counter + 1) % nRandomNumbers;
+
 
         if (currentCity == -1) {
           printf("There is an error choosing the next city in iteration %d fot ant %d\n", loop_counter, ant_counter);
@@ -143,9 +147,6 @@ int main(int argc, char* argv[]) {
 
       if (oldCost > bestCost) {
         copyVectorInt(currentPath, bestPath, nCities);
-        terminationCondition = 0;
-      } else {
-        terminationCondition++;
       }
     }
     //
@@ -159,11 +160,19 @@ int main(int argc, char* argv[]) {
     // Update pheromons
     updatePheromons(pheromons, bestPath, bestCost, nCities);
 
+    if (previousIterationCost > bestCost) {
+      previousIterationCost = bestCost;
+      terminationCondition = 0;
+    } else {
+      terminationCondition++;
+    }
+
     loop_counter++;
   }
+  printf("NbOfLoops %d\n", loop_counter);
 
   //printPath(bestPath, nCities);
-  //printf("best cost : %d\n", bestCost);
+  printf("best cost : %d\n", bestCost);
 
   end = second();
   printf("Total time : %f\n", (end-start));
