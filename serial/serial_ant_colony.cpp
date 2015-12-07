@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
   loop_counter = 0;
 
   // External loop
-  while (loop_counter < iterations && terminationCondition < ceilf(iterations * terminationConditionPercentage)) {
+  while (loop_counter < iterations && terminationCondition < ceilf(nAnts * iterations * terminationConditionPercentage)) {
 
     // printf("Loop nr. : %d\n", loop_counter);
 

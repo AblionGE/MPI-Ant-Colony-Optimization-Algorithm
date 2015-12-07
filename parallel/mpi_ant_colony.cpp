@@ -244,10 +244,14 @@ int main(int argc, char* argv[]) {
     }
 
     nAnts = nAntsPerNode[prank];
+    int totalNAnts = 0;
+    for (i = 0; i < psize; i++) {
+      totalNAnts += nAntsPerNode[i];
+    }
 
     random_counter = (random_counter + (onNodeIteration * prank)) % nRandomNumbers;
 
-    while (external_loop_counter < externalIterations && terminationCondition < (int) ceilf(externalIterations * onNodeIteration * terminationConditionPercentage)) {
+    while (external_loop_counter < externalIterations && terminationCondition < (int) ceilf(totalNAnts * externalIterations * onNodeIteration * terminationConditionPercentage)) {
       loop_counter = 0;
       while (loop_counter < onNodeIteration) {
 
