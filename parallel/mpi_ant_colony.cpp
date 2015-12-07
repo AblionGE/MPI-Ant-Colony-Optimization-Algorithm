@@ -30,7 +30,6 @@ int main(int argc, char* argv[]) {
   int *otherBestPath;
   int *currentPath;
   int bestCost = INFTY;
-  int previousIterationCost = INFTY;
   int otherBestCost;
   float* localPheromonsPath;
   float* otherPheromonsPath;
@@ -289,7 +288,10 @@ int main(int argc, char* argv[]) {
           bestCost = updateBestPath(bestCost, bestPath, currentPath, map, nCities);
 
           if (oldCost > bestCost) {
+            terminationCondition = 0;
             copyVectorInt(currentPath, bestPath, nCities);
+          } else {
+            terminationCondition++;
           }
         }
 
@@ -299,13 +301,6 @@ int main(int argc, char* argv[]) {
         }
         // Update pheromons
         updatePheromons(pheromons, bestPath, bestCost, nCities);
-
-        if (previousIterationCost > bestCost) {
-          previousIterationCost = bestCost;
-          terminationCondition = 0;
-        } else {
-          terminationCondition++;
-        }
 
         loop_counter++;
       }

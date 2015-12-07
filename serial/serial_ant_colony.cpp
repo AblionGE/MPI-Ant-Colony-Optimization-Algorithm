@@ -18,7 +18,6 @@ int main(int argc, char* argv[]) {
   int *bestPath;
   int *currentPath;
   int bestCost = INFTY;
-  int previousIterationCost = INFTY;
   int* randomNumbers;
 
   char* mapFile = argv[1];
@@ -147,6 +146,9 @@ int main(int argc, char* argv[]) {
 
       if (oldCost > bestCost) {
         copyVectorInt(currentPath, bestPath, nCities);
+        terminationCondition = 0;
+      } else {
+        terminationCondition++;
       }
     }
     //
@@ -160,16 +162,8 @@ int main(int argc, char* argv[]) {
     // Update pheromons
     updatePheromons(pheromons, bestPath, bestCost, nCities);
 
-    if (previousIterationCost > bestCost) {
-      previousIterationCost = bestCost;
-      terminationCondition = 0;
-    } else {
-      terminationCondition++;
-    }
-
     loop_counter++;
   }
-  printf("NbOfLoops %d\n", loop_counter);
 
   //printPath(bestPath, nCities);
   printf("best cost : %d\n", bestCost);
