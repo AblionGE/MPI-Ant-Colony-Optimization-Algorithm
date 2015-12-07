@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
   int *otherBestPath;
   int *currentPath;
   int bestCost = INFTY;
+  int otherBestCost;
   float* localPheromonsPath;
   float* otherPheromonsPath;
 
@@ -45,6 +46,8 @@ int main(int argc, char* argv[]) {
   float evaporationCoeff; 
   int nCities = 0;
   int* nAntsPerNode;
+  int terminationCondition = 0;
+  int otherTerminationCondition = 0;
 
   // share random file first
   if (prank == 0) {
@@ -239,7 +242,7 @@ int main(int argc, char* argv[]) {
 
     random_counter = (random_counter + (onNodeIteration * prank)) % nRandomNumbers;
 
-    while (external_loop_counter < externalIterations) {
+    while (external_loop_counter < externalIterations && terminationCondition < ceilf(external_loop_counter * onNodeIteration * 0.8)) {
       loop_counter = 0;
       while (loop_counter < onNodeIteration) {
 
@@ -279,6 +282,9 @@ int main(int argc, char* argv[]) {
 
           if (oldCost > bestCost) {
             copyVectorInt(currentPath, bestPath, nCities);
+            terminationCondition = 0;
+          } else {
+            terminationCondition++;
           }
         }
 
@@ -297,6 +303,7 @@ int main(int argc, char* argv[]) {
         if (prank == i) {
           copyVectorInt(bestPath, otherBestPath, nCities);
           copyVectorFloat(localPheromonsPath, otherPheromonsPath, nCities);
+          otherTerminationCondition = terminationCondition;
         }
         if (MPI_Bcast(&otherBestPath[0], nCities, MPI_INT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
           printf("Node %d : Error in Broadcast of otherBestPath", prank);
@@ -308,8 +315,22 @@ int main(int argc, char* argv[]) {
           MPI_Finalize();
           return -1;
         }
+        if (MPI_Bcast(&otherTerminationCondition, 1, MPI_INT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
+          printf("Node %d : Error in Broadcast of otherTerminationCondition", prank);
+          MPI_Finalize();
+          return -1;
+        }
 
         if (prank != i) {
+          otherBestCost = updateBestPath(bestCost, bestPath, otherBestPath, map, nCities);
+          if (otherBestCost < bestCost) {
+            terminationCondition = otherTerminationCondition;
+            bestCost = otherBestCost;
+            copyVectorInt(otherBestPath, bestPath,  nCities);
+          } else if (otherBestCost == bestCost) {
+            terminationCondition += otherTerminationCondition;
+          }
+
           for (j = 0; j < nCities - 1; j++) {
             pheromons[getMatrixIndex(otherBestPath[i],otherBestPath[i+1],nCities)] += otherPheromonsPath[i];
             pheromons[getMatrixIndex(otherBestPath[i+1],otherBestPath[i],nCities)] += otherPheromonsPath[i];
@@ -367,7 +388,6 @@ int main(int argc, char* argv[]) {
     free(otherPheromonsPath);
     free(bestPath);
     free(otherBestPath);
-    free(currentPath);
 
     MPI_Finalize();
 

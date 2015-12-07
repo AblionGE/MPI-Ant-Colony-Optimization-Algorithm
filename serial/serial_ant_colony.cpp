@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
   float evaporationCoeff = atof(argv[7]);
   int nCities = 0;
   int nRandomNumbers = 0;
+  int terminationCondition = 0;
 
   start = second();
 
@@ -106,7 +107,7 @@ int main(int argc, char* argv[]) {
   loop_counter = 0;
 
   // External loop
-  while (loop_counter < iterations) {
+  while (loop_counter < iterations && terminationCondition < ceilf(iterations * 0.2)) {
 
     // printf("Loop nr. : %d\n", loop_counter);
 
@@ -142,6 +143,9 @@ int main(int argc, char* argv[]) {
 
       if (oldCost > bestCost) {
         copyVectorInt(currentPath, bestPath, nCities);
+        terminationCondition = 0;
+      } else {
+        terminationCondition++;
       }
     }
     //
