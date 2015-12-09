@@ -413,7 +413,7 @@ int main(int argc, char* argv[]) {
 
   if (prank == 0) {
     // printPath(bestPath, nCities);
-    printf("best cost : %d\n", bestCost);
+    // printf("best cost : %d\n", bestCost);
   }
 
   if (prank == 0) {
