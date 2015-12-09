@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
   }
 
   //printPath(bestPath, nCities);
-  printf("best cost : %d\n", bestCost);
+  //printf("best cost : %d\n", bestCost);
 
   end = second();
   printf("Total time : %f\n", (end-start));
