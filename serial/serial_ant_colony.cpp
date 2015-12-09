@@ -8,6 +8,7 @@ int main(int argc, char* argv[]) {
   }
 
 
+  printf("NbOfAgents 1");
   int i, j, loop_counter, ant_counter, cities_counter;
   int random_counter = 0;
   int *map = NULL;
