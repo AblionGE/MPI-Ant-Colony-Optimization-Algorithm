@@ -17,7 +17,7 @@ echo "#SBATCH --nodes 1" >> $SERIAL
 echo "#SBATCH --ntasks-per-node 1" >> $SERIAL
 echo "#SBATCH --cpus-per-task 1" >> $SERIAL
 echo "#SBATCH --mem 4096" >> $SERIAL
-echo "#SBATCH --time 12:00:00" >> $SERIAL
+echo "#SBATCH --time 23:59:59" >> $SERIAL
 echo "module purge" >> $SERIAL
 echo "srun ./serial/serial_ant_colony map.txt random.txt $NB_ANTS $NB_TOTAL_LOOP $ALPHA $BETA $EVAPORATION" >> $SERIAL
 sbatch $SERIAL
@@ -36,7 +36,7 @@ do
   echo "#SBATCH --ntasks-per-node 1" >> $FILE
   echo "#SBATCH --cpus-per-task 1" >> $FILE
   echo "#SBATCH --mem 4096" >> $FILE
-  echo "#SBATCH --time 12:00:00" >> $FILE
+  echo "#SBATCH --time 23:59:59" >> $FILE
   echo "module purge" >> $FILE
   echo "module load intel intelmpi" >> $FILE
   echo "srun ./parallel/mpi_ant_colony map.txt random.txt $NB_ANTS $NB_EXTERNAL_LOOP $NB_INTERNAL_LOOP $ALPHA $BETA $EVAPORATION" >> $FILE
