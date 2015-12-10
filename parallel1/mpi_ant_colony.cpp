@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   int* nAntsPerNode;
   int terminationCondition = 0;
   int otherTerminationCondition = 0;
-  float terminationConditionPercentage = 0.5;
+  float terminationConditionPercentage = 0.4;
 
   // share random file first
   if (prank == 0) {
@@ -413,7 +413,7 @@ int main(int argc, char* argv[]) {
 
   if (prank == 0) {
     // printPath(bestPath, nCities);
-    // printf("best cost : %d\n", bestCost);
+    printf("best cost : %d\n", bestCost);
   }
 
   if (prank == 0) {

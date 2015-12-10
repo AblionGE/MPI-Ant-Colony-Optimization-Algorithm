@@ -12,6 +12,7 @@ loops=$4
 
 # Compile codes
 
+module load intel intelmpi
 cd parallel
 make clean
 make

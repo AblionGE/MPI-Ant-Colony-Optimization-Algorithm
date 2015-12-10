@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
   int nCities = 0;
   int nRandomNumbers = 0;
   int terminationCondition = 0;
-  float terminationConditionPercentage = 0.5;
+  float terminationConditionPercentage = 0.4;
 
   start = second();
 
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
   }
 
   //printPath(bestPath, nCities);
-  //printf("best cost : %d\n", bestCost);
+  printf("best cost : %d\n", bestCost);
 
   end = second();
   printf("Total time %f\n", (end-start));
