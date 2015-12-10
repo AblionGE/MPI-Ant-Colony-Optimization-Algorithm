@@ -1,10 +1,18 @@
 #!/bin/bash
 
+if [ "$#" -ne 2 ]; then
+  echo "usage $0 mapFile randomFile"
+  exit 1
+fi
+
+mapFile=$1
+randomFile=$2
+
 ROOT="ant_colony"
 NB_ANTS=32
-NB_INTERNAL_LOOP=100
+NB_INTERNAL_LOOP=50
 NB_EXTERNAL_LOOP=100
-NB_TOTAL_LOOP=10000
+NB_TOTAL_LOOP=5000
 ALPHA=1
 BETA=1
 EVAPORATION=0.9
@@ -19,7 +27,7 @@ echo "#SBATCH --cpus-per-task 1" >> $SERIAL
 echo "#SBATCH --mem 4096" >> $SERIAL
 echo "#SBATCH --time 23:59:59" >> $SERIAL
 echo "module purge" >> $SERIAL
-echo "srun ./serial/serial_ant_colony map.txt random.txt $NB_ANTS $NB_TOTAL_LOOP $ALPHA $BETA $EVAPORATION" >> $SERIAL
+echo "srun ./serial/serial_ant_colony $mapFile $randomFile $NB_ANTS $NB_TOTAL_LOOP $ALPHA $BETA $EVAPORATION" >> $SERIAL
 sbatch $SERIAL
 
 
@@ -39,6 +47,6 @@ do
   echo "#SBATCH --time 23:59:59" >> $FILE
   echo "module purge" >> $FILE
   echo "module load intel intelmpi" >> $FILE
-  echo "srun ./parallel/mpi_ant_colony map.txt random.txt $NB_ANTS $NB_EXTERNAL_LOOP $NB_INTERNAL_LOOP $ALPHA $BETA $EVAPORATION" >> $FILE
+  echo "srun ./parallel/mpi_ant_colony $mapFile $randomFile $NB_ANTS $NB_EXTERNAL_LOOP $NB_INTERNAL_LOOP $ALPHA $BETA $EVAPORATION" >> $FILE
   sbatch $FILE
 done
