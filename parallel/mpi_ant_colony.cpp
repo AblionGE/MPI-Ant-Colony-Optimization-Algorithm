@@ -418,7 +418,7 @@ int main(int argc, char* argv[]) {
 
   if (prank == 0) {
     end = second();
-    printf("TotalTime : %f\n", (end - start));
+    printf("TotalTime %f\n", (end - start));
   }
 
   // deallocate the pointers

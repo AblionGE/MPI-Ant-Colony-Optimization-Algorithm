@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
   //printf("best cost : %d\n", bestCost);
 
   end = second();
-  printf("Total time : %f\n", (end-start));
+  printf("Total time %f\n", (end-start));
 
   // deallocate the pointers
   free(map);
