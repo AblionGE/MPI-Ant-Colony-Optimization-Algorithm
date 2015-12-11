@@ -16,7 +16,7 @@ module load intel intelmpi
 cd parallel1
 make clean
 make
-cd 2.
+cd ..
 cd parallel2
 make clean
 make

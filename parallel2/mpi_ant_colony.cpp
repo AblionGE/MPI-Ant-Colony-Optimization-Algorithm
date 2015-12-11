@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
   float* otherPheromonsPath;
 
   long* randomNumbers;
-  int nRandomNumbers = 0;
+  long nRandomNumbers = 0;
 
   char* mapFile;
   char* randomFile;
@@ -61,6 +61,7 @@ int main(int argc, char* argv[]) {
   if (prank == 0) {
     std::ifstream in;
     randomFile = argv[2];
+    printf("RandomFile %s\n", randomFile);
     char out[20];
 
     // Read random numbers file
@@ -85,6 +86,7 @@ int main(int argc, char* argv[]) {
     while(!in.eof()) {
       in >> out;
       randomNumbers[i] = atol(out);
+      i++;
     }
 
     in.close();
@@ -128,7 +130,7 @@ int main(int argc, char* argv[]) {
     evaporationCoeff = atof(argv[8]);
 
     int antsPerNode = nAnts / psize;
-    int restAnts = nAnts % psize;
+    int restAnts = nAnts - antsPerNode * psize;
 
     for (i = 0; i < psize; i++) {
       nAntsPerNode[i] = antsPerNode;
@@ -246,7 +248,7 @@ int main(int argc, char* argv[]) {
     bestPath[i] = -1;
   }
   for (i = 0; i < nCities * nCities; i++) {
-    pheromons[i] = 0.1;
+    pheromons[i] = 1;
   }
 
   nAnts = nAntsPerNode[prank];

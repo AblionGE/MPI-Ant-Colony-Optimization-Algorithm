@@ -162,10 +162,10 @@ int computeNextCity(int currentCity, int* path, int* map, int nCities, float* ph
   return -1;
 }
 
-int updateBestPath(int bestCost, int* bestPath, int* currentPath, int* map, int nCities) {
+long updateBestPath(long bestCost, int* bestPath, int* currentPath, int* map, int nCities) {
   // compute currentCost
   int i;
-  int currentCost = 0;
+  long currentCost = 0;
   int* orderedCities = (int*) malloc(nCities*sizeof(int));
 
   for (i = 0; i < nCities; i++) {
@@ -184,7 +184,7 @@ int updateBestPath(int bestCost, int* bestPath, int* currentPath, int* map, int 
   }
 }
 
-void updatePheromons(float* pheromons, int* path, int cost, int nCities) {
+void updatePheromons(float* pheromons, int* path, long cost, int nCities) {
   int i;
   int* orderedCities = (int*) malloc(nCities*sizeof(int));
 
@@ -194,12 +194,12 @@ void updatePheromons(float* pheromons, int* path, int cost, int nCities) {
   }
 
   for (i = 0; i < nCities - 1; i++) {
-    pheromons[getMatrixIndex(orderedCities[i],orderedCities[i + 1], nCities)] += 1/cost;
-    pheromons[getMatrixIndex(orderedCities[i + 1],orderedCities[i], nCities)] += 1/cost;
+    pheromons[getMatrixIndex(orderedCities[i],orderedCities[i + 1], nCities)] += 1.0/cost;
+    pheromons[getMatrixIndex(orderedCities[i + 1],orderedCities[i], nCities)] += 1.0/cost;
   }
   // add last
-  pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] += 1/cost;
-  pheromons[getMatrixIndex(orderedCities[0],orderedCities[nCities - 1], nCities)] += 1/cost;
+  pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] += 1.0/cost;
+  pheromons[getMatrixIndex(orderedCities[0],orderedCities[nCities - 1], nCities)] += 1.0/cost;
 }
 
 #if __linux__ 

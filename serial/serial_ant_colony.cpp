@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  printf("NbOfAgents 0");
+  printf("NbOfAgents 0\n");
 
   int i, j, loop_counter, ant_counter, cities_counter;
   int random_counter = 0;
@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
   // else, the city is visited at step i
   int *bestPath;
   int *currentPath;
-  int bestCost = INFTY;
+  long bestCost = INFTY;
   int* randomNumbers;
 
   char* mapFile = argv[1];
@@ -101,9 +101,9 @@ int main(int argc, char* argv[]) {
   for (i = 0; i < nCities; i++) {
     currentPath[i] = -1;
     bestPath[i] = -1;
-    for (j = 0; j < nCities; j++) {
-      pheromons[getMatrixIndex(i,j,nCities)] = 0.1;
-    }
+  }
+  for (j = 0; j < nCities*nCities; j++) {
+    pheromons[j] = 1;
   }
 
   loop_counter = 0;
@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
       }
 
       // update bestCost and bestPath
-      int oldCost = bestCost;
+      long oldCost = bestCost;
       bestCost = updateBestPath(bestCost, bestPath, currentPath, map, nCities);
 
       if (oldCost > bestCost) {
@@ -167,7 +167,7 @@ int main(int argc, char* argv[]) {
   }
 
   //printPath(bestPath, nCities);
-  printf("best cost : %d\n", bestCost);
+  printf("best cost : %ld\n", bestCost);
 
   end = second();
   printf("Total time %f\n", (end-start));
