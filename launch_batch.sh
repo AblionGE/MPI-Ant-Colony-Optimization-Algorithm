@@ -37,7 +37,7 @@ fi
 
 for i in $(seq $loops)
 do
-  RAND="random$1.txt"
+  RAND="random$i.txt"
   ./generate_random_numbers $RAND 100000
   ./batch.sh $mapFileName $RAND
 done
