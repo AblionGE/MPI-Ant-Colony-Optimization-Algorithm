@@ -33,10 +33,11 @@ int main(int argc, char* argv[]) {
   int terminationCondition = 0;
   float terminationConditionPercentage = 0.4;
 
-  start = second();
-
+  printf("RandomFile %s\n", randomFile);
   printf("Iterations %d\n", iterations);
   printf("Ants %d\n", nAnts);
+
+  start = second();
 
   // Load the map and the number of cities
   std::ifstream in;
