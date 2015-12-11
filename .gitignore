@@ -79,3 +79,4 @@ Makefile
 *.swp
 */*.swp
 *.pdf
+*.run
