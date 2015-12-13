@@ -37,30 +37,28 @@ With this complexity, we can observe that number of ants and the size of the map
 For the parallel implementation of the *ant colony optimization algorithm*, we have to define what is parallelized and what are the content of communications.
 
 ### Basic Parallel Application
-For the analysis below, let us consider we have $c$ cities, $A$ ants, $n$ nodes (including the master) and we assume that the external loop has a fixed number of iterations such that we do not have to take it into account.
-Indeed, we can compute the complexity for one *external* iteration only. That allows us to remove the factor $L$.
+For the analysis below, let us consider we have $c$ cities, $A$ ants, $n$ nodes (including the master) and we assume that the loop has a fixed number of iterations $L$.
 
 #### Computation to communication time
 
 For the initialization part, the graph will be spread by the master to each node ($O(c^2)$) using broadcasting.
-And, at the beginning of each iteration, the master needs to send the pheromon's matrix.
+And, at the end of each iteration, each node will have the share its result (best path or whole pheromons' matrix) to others using broadcasting ($O(n * c)$ for sharing the best path or $O(n * c^2)$ for sharing the whole matrix).
 
 Then, each node will compute the paths of multiple ants ($O(c \cdot \frac{A}{n})$).
 We assume that each node has the same number of ants.
 The computation on each node is exactly the same as in the serial application except that each node has only a subset of ants.
 We can add that if we want to do several iteration before merging the results, we will simply multiple this cost by a constant, which will not change the bounded complexity.
 
-Then, when they all have finished to compute the new map with new pheromon's values, all nodes send their local best path to the master.
+Then, when they all have finished to compute the new map with new pheromon's values, all nodes send their local best path to the others.
 The cost of sending all vectors is $O(cn)$.
 
-Finally, the master will merge all received vectors ($O(c \cdot n)$ additions) and will perform the *pheromon evaporation* ($O(c^2)$) and decide if another iteration is needed or not.
+Finally, each node will merge all received vectors ($O(c \cdot n)$ additions) and will perform the *pheromon evaporation* ($O(c^2)$) and decide if another iteration is needed or not.
 
-Thus, for computation time we have a cost of $O(c \cdot \frac{A}{n} + c \cdot n)$ and for communication time we have a cost of $O(c^2 + cn + c^2)$ because the master must resend the pheromon's matrix after each merge operations.
+Thus, for computation time we have a cost of $O(L \cdot (c \cdot \frac{A}{n} + c \cdot n + c^2))$ and for communication time we have a cost of $O(c^2 + L \cdot c \cdot n)$\footnote{We share only the best path from each node.} because each has to send its best path at each iteration.
 
-The *Computation/Communication* ratio is $\frac{O(c \cdot \frac{A}{n} + cn + c^2)}{O(c^2 + cn)}$ which tells us that the size of the problem will not make the communications less important. In fact, the only way to have more computations than communications is to have $\frac{A}{n} > c$.
+The *Computation/Communication* ratio is $\frac{O(L \cdot (c \cdot \frac{A}{n} + cn + c^2))}{O(c^2 + L \cdot c \cdot n)}$ which tells us that the size of the problem will not make the communications less important. In fact, the only way to have more computations than communications is to have $\frac{A}{n} > c$.
 
-Nevertheless, we can implement the master such that it does not send all elements in the matrix but only the half of them (as it is symmetric).
-But, in a theoretical analysis, we conclude that the communications are really costly for this algorithm.
+We conclude that the communications are really costly for this algorithm.
 
 #### Amdhal's law
 
@@ -73,48 +71,108 @@ $$
 
 ##### Without data transfer
 
-If we do not account for data transfers, the fraction of the code that cannot be parallelized is when the master creates the matrix at the beginning of the program and when it merges all results from nodes.
+If we do not account for data transfers, the fraction of the code that cannot be parallelized is when the master creates the matrix at the beginning of the program and when all nodes share their best paths.
 
-Considering the complexities defined above, the serial part will have a complexity of $O(c^2)$ to initialize the matrix and then a complexity of $O(c \cdot n)$ to update the matrix and $O(c^2)$ to perform the *pheromon evaporation*.
-It gives us $c \cdot (n + 2c)$ operations.
+Considering the complexities defined above, the serial part will have a complexity of $O(c^2)$ to initialize the matrix and then a complexity of $O(L \cdot c \cdot n)$ to update the matrix. 
+It gives us $c \cdot (L \cdot n + c)$ operations.
 
-For the parallel part, we have $c \cdot \frac{A}{n} \cdot c$ operations\footnote{We go through each city and in each city we have to compute the probabilities for each other cities.}.
+For the parallel part, we have $L \cdot c \cdot \frac{A}{n} \cdot c + L \cdot c^2$ operations\footnote{We go through each city and in each city we have to compute the probabilities for each other cities and finally we update the peromons' matrix.}.
 
-Thus, $$f = \frac{c \cdot (n + 2c)}{c \cdot (n + 2c) + c^2 \cdot \frac{A}{n}} = \frac{n+2c}{n + 2c + \frac{cA}{n}} = \frac{n+2c}{n+c(2+\frac{A}{n})}$$
+Thus, $$f = \frac{c \cdot (L \cdot n + c)}{c \cdot (L \cdot n + c) + L \cdot c^2 \cdot (1 + \frac{A}{n})} = \frac{L \cdot n+c}{L \cdot n + c + L \cdot c \cdot (1 + \frac{A}{n})}$$
 
 Here, we observe that $A$ and $n$ are important. To have a small $f$, we need to have more ants than nodes. It is logical, because to have an efficient parellelization of this program, nodes must have something to compute (the computation time on nodes must be big compared to communications.
+
+Table \ref{table_without_data_transfer} and figure \ref{without_data_transfer} show us the important relation between the number of ants and nodes.
+
+\begin{figure}[!h]
+\begin{center}
+  \begin{tabular}{|p{2.5cm}|p{3cm}|}
+    \hline
+    \bf Nodes $\backslash$ Ants & \bf 16\\
+    \hline
+    \bf 1 & 0.000070583252947\%\\
+    \hline
+    \bf 2 & 0.000244384705961\%\\
+    \hline
+    \bf 4 & 0.000839294992207\%\\
+    \hline
+    \bf 8 & 0.002725882587594\%\\
+    \hline
+    \bf 16 & 0.008034917170916\%\\
+    \hline
+  \end{tabular}
+  \caption{\it Percentages of serial code execution without considering data transfer for 16 ants, 5000 iterations and 1000 cities.}
+  \label{table_without_data_transfer}
+\end{center}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.4]{img/without_data_transfer.png}
+  \caption{\it Percentages of serial code execution without considering data transfer for 16 ants, 5000 iterations and 1000 cities.}
+  \label{without_data_transfer}
+\end{figure}
 
 ##### More accurate estimation
 
 Now, if we consider the transfer of data between nodes, we must modify the value of $f$. Indeed, we have to consider the communication time in our computations.
-To send a matrix from the master to each node, we have $c^2$ values sent to $n$ nodes using broadcast and we have $c \cdot n$ values returned from $n$ nodes. Thus, we have :
+To send a matrix from the master to each node, we have $c^2$ values sent to $n$ nodes using broadcast and we have $c \cdot n$ values returned from $n$ nodes $L$ times. Thus, we have :
 
 $$
-f = \frac{c \cdot (n + 2c) + c \cdot (c + n)}{c \cdot (n + 2c) + c^2 \cdot \frac{A}{n}+ cn \cdot (c + n)} = \frac{2n + 3c}{n^2 + n + 2c + \frac{cA}{n}}
+f = \frac{c \cdot (L \cdot n + c) + c \cdot (c + L \cdot n)}{c \cdot (L \cdot n + c) + c^2 + c \cdot L \cdot n + L \cdot c^2 \cdot (1 + \frac{A}{n})} = \frac{2 * (c^2 + c \cdot L \cdot n)}{2 * (c^2 + c \cdot L \cdot n) + L \cdot c^2 \cdot (1 + \frac{A}{n})}
 $$
 
-Again here, we observe that the number of ants compared to the number of nodes is important to have a good speedup.
+Again here, we observe (figure \ref{with_data_transfer} and table \ref{table_with_data_transfer}) that the number of ants compared to the number of nodes is important to have a good speedup.
 We can already affirm that adding ressources for solving this problem will not be efficient if the problem is not big enough (not enough cities and ants).
+
+\begin{figure}[!h]
+\begin{center}
+  \begin{tabular}{|p{2.5cm}|p{3cm}|}
+    \hline
+    \bf Nodes $\backslash$ Ants & \bf 16\\ 
+    \hline
+    \bf 1 & 0.000070583252947\%\\
+    \hline
+    \bf 1 & 0.000244384705961\%\\
+    \hline
+    \bf 1 & 0.000839294992207\%\\
+    \hline
+    \bf 1 & 0.002725882587594\%\\
+    \hline
+    \bf 1 & 0.008034917170916\%\\
+    \hline
+  \end{tabular}
+  \caption{\it Percentages of serial code execution with considering data transfer for 16 ants, 5000 iterations and 1000 cities.}
+  \label{table_with_data_transfer}
+\end{center}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.4]{img/with_data_transfer.png}
+  \caption{\it Percentages of serial code execution with considering data transfer for 16 ants, 5000 iterations and 1000 cities.}
+  \label{with_data_transfer}
+\end{figure}
+
+We can observe that the more accurate estimation has exactly the same result as the one without considering data transfer. We can explain that with the fact that the code for communications has te same importance in this analysis as the initialization of the map and the pheromons update. Thus, the fraction of serial code stays the same (even if in reality, the communication will take much longer than updating two matrices).
 
 ### Improved Parallel Application
 
 As we can observe with the parallel implementation where we send the whole matrix at each iteration, we can reduce the communications with computing several iterations locally before sending the matrix to the master (we reduce the communications having more accurate local solutions before merging).
 We also can send to the master only the best path over several iterations.
 
-As we want to improve the performances of the parallel application we can consider both improvements together. Thus, we need to define the variable $l$ which represents the number of iterations to perform locally before merging the best path to the master. The theoretical speedup upper bound is presented below.
+As we want to improve the performances of the parallel application we can consider both improvements together. Thus, we need to define the variable $l$ which represents the number of iterations to perform locally before merging the best path to the master. The theoretical speedup upper bound is presented below. We will do here the prediction for these improvements, but we need to be sure that the solutions provided with these improvements is still good compared to the serial implementation. This will be done in the last part of this report.
 
 #### Computation to communication time
 
 The initialization part stays the same as in the basic parallel application : $O(c^2)$ to initialize the matrix and $O(c^2)$ to send it to the nodes.
 
-For the computation complexity on nodes, we have now a complexity of $O(l \cdot c \cdot \frac{A}{n}$).
+For the computation complexity on nodes, we have now a complexity of $O(L' \cdot (l \cdot c \cdot \frac{A}{n})$).
 The update of pheromon values is done locally and is kept between local and external iterations\footnote{Thus, we have some history in each node to help it to find a solution faster.}.
 
-Then, for the merge to the master, we only send the best path (which needs to be kept in a local variable and updated after each ant execution). Thus the complexity is $O(c \cdot n)$.
+Then, for the merge with other nodes, we only send the best path (which needs to be kept in a local variable and updated after each ant execution). Thus the complexity is $O(L' \cdot c \cdot n)$.
 
-Finally, the master has to merge all nodes results : $O(c \cdot n)$.
+Finally, every node has to merge all other nodes results : $O(L' \cdot c \cdot n)$.
 
-The $Computation/Communication$ ratio is $$\frac{c^2 + l \cdot c \cdot \frac{A}{n} + c \cdot n}{c^2 + c \cdot n} = \frac{c + l \cdot \frac{A}{n} + n}{c + n}$$.
+The $Computation/Communication$ ratio is $$\frac{c^2 + L' \cdot (l \cdot c \cdot \frac{A}{n} + c \cdot n)}{c^2 + L' \cdot c \cdot n} = \frac{c + L' \cdot (l \cdot \frac{A}{n} + n)}{c + L' \cdot n}$$.
 
 Here we can conclude that the larger is the problem (in term of ants, city and thus local iterations), the smaller is the impact of communication.
 Nevertheless, more we have nodes, more are the communications important (this seems totally logic).
@@ -123,22 +181,78 @@ Nevertheless, more we have nodes, more are the communications important (this se
 
 ##### Without data transfer
 
-Without considering the data transfer, we have to compute in a serial manner the initialization of the matrices ($c^2$) and the merge of all best paths ($n \cdot c$).
-For the parallel part, we have the computation of the best path for each ant with several local iterations ($l \cdot (c \cdot \frac{A}{n}$)).
+Without considering the data transfer, we have to compute in a serial manner the initialization of the matrices ($c^2$) and the merge of all best paths ($L' \cdot n \cdot c$).
+For the parallel part, we have the computation of the best path for each ant with several local iterations ($L' \cdot (l \cdot (c^2 \cdot \frac{A}{n}$))).
 
 Thus, we have the following non-parallel fragment :
-$$f = \frac{c^2 + n \cdot c}{c^2 + n \cdot c + \frac{lcA}{n}} = \frac{c + n}{c + n + \frac{lA}{n}}$$
+$$f = \frac{c^2 + L' \cdot n \cdot c}{c^2 + L' \cdot n \cdot c + \frac{L' \cdot l \cdot c^2 \cdot A}{n}} = \frac{c + L' \cdot n}{c + L' \cdot n + \frac{L' \cdot l \cdot c \cdot A}{n}}$$
 
-We observe again that the number of ants and the number of local iterations is important to maximize the speedup. Thus, more we have nodes, more we need to have a bigger problem to solve to keep a reasonnable speedup.
+We observe (table \ref{improved_table_without_data_transfer} and figure \ref{improved_without_data_transfer}) again that the number of ants and the number of local iterations is important to maximize the speedup. Thus, more we have nodes, more we need to have a bigger problem to solve to keep a reasonnable speedup.
+
+\begin{figure}[!h]
+\begin{center}
+  \begin{tabular}{|p{2.5cm}|p{3cm}|}
+    \hline
+    \bf Nodes $\backslash$ Ants & \bf 16\\ 
+    \hline
+    \bf 1 & 0.012941008998707\%\\
+    \hline
+    \bf 2 & 0.026665955574518\%\\
+    \hline
+    \bf 4 & 0.055996864175606\%\\
+    \hline
+    \bf 8 & 0.119985601727793\%\\
+    \hline
+    \bf 16 & 0.259932417571431\%\\
+    \hline
+  \end{tabular}
+  \caption{\it Percentages of serial code execution without considering data transfer for 16 ants, 100 external iterations, 50 local iterations and 1000 cities. Results must be multiplied by $10^{-3}$}
+  \label{improved_table_without_data_transfer}
+\end{center}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.4]{img/improved_without_data_transfer.png}
+  \caption{\it Percentages of serial code execution without considering data transfer for 16 ants, 100 external iterations, 50 local iterations and 1000 cities.}
+  \label{improved_without_data_transfer}
+\end{figure}
 
 ##### More accurate estimation
 
-For having a more accurate estimation, we consider the communication time. As we defined above, we consider the send of the whole matrix ($c^2$) to each node and the send of all best paths ($c \cdot n$).
+For having a more accurate estimation, we consider the communication time. As we defined above, we consider the send of the whole matrix ($c^2$) to each node and the send of all best paths ($L' \cdot c \cdot n$).
 Thus, we have :
 
-$$f = \frac{c^2 + n \cdot c + c^2 + c \cdot n}{c^2 + n \cdot c + c^2 + c \cdot n + \frac{lcA}{n}} = \frac{2c + 2n}{2c + 2n + \frac{lA}{n}} = \frac{2c + 2n}{2c + 2n + \frac{lA}{n}}$$
+$$f = \frac{2 * (c^2 + L' \cdot n \cdot c)}{2 * (c^2 + L' \cdot n \cdot c) + \frac{L' \cdot l \cdot c^2 \cdot A}{n}} = \frac{2 * (c + L' \cdot n)}{2 * (c + L' \cdot n) + \frac{L' \cdot l \cdot c \cdot A}{n}}$$
 
-Again, we can observe that the number of ants and the number of local iterations is important to define the speedup, but, here, the number of cities makes the communication more dominant. It is logic, because the vectors will be bigger so the communications increase with the number of cities and the number of nodes.
+Again, we can observe (table \ref{improved_table_with_data_transfer} and figure \ref{improved_with_data_transfer}) that the number of ants and the number of local iterations is important to define the speedup, but, here, the number of cities makes the communication more dominant. It is logic, because the vectors will be bigger so the communications increase with the number of cities and the number of nodes.
+
+\begin{figure}[!h]
+\begin{center}
+  \begin{tabular}{|p{2.5cm}|p{3cm}|}
+    \hline
+    \bf Nodes $\backslash$ Ants & \bf 16\\ 
+    \hline
+    \bf 1 & 0.000027499243771\%\\
+    \hline
+    \bf 2 & 0.000059996400216\%\\
+    \hline
+    \bf 4 & 0.000139980402744\%\\
+    \hline
+    \bf 8 & 0.000359870446639\%\\
+    \hline
+    \bf 16 & 0.001038919523695\%\\
+    \hline
+  \end{tabular}
+  \caption{\it Percentages of serial code execution with considering data transfer for 16 ants, 100 external iterations, 50 local iterations and 1000 cities.}
+  \label{improved_table_with_data_transfer}
+\end{center}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.4]{img/improved_with_data_transfer.png}
+  \caption{\it Percentages of serial code execution with considering data transfer for 16 ants, 100 external iterations, 50 local iterations and 1000 cities.}
+  \label{improved_with_data_transfer}
+\end{figure}
 
 ### Conclusion on Amdahl's law analysis
 
@@ -150,7 +264,7 @@ Nevertheless, Amdahl's law gives us a good idea of how many cores we need for a 
 
 Now, I will establish an analysis of the speedup using the framework *Message Passing Interface (MPI)* which allows several computational nodes to work together in a distributed memory fashion.
 
-As discussed in part \ref{theoretical_analysis}, we have the following sequence of message passing for one master and 3 nodes.
+As discussed in part \ref{theoretical_analysis}, we have the following sequence of message passing for one master and 3 nodes\footnote{Of course, in the real implementation, the master will work as a node, too.}.
 
 For spreading the matrix into all nodes, we can use ```MPI_BCAST``` which sends to all nodes the same data. It allow us to improve a bit the communications.
 
@@ -162,7 +276,7 @@ We also have two *MPI* operations which are when the master send the matrix to e
 
 \begin{figure}[!h]
   \centering \includegraphics[scale=0.5]{img/flow_diagram.png}
-  \caption{\it General scheme of the application}
+  \caption{\it General scheme of the application. The broadcast allows nodes to share their best paths together.}
   \label{diagram}
 \end{figure}
 The sequence of message passing is presented in figure \ref{message_passing} for one iteration, without considering the local computations.
@@ -187,13 +301,13 @@ Indeed, all comunications are sending only one value so, without considering pro
 For computations, if all nodes have the same number of ants to manage, they will have a similar computation time (if the machines have an identical architecture and hardware) because in all cases the map has the same size, and each city has the same number of neighbours to consider.
 
 \begin{figure}[!h]
-  \centering \includegraphics[scale=0.55]{img/timing_diagram.png}
+  \centering \includegraphics[scale=0.45]{img/timing_diagram.png}
   \caption{\it Timing diagram for initialization + one iteration with 3 nodes. \textit{bp} means \textit{best path}.}
   \label{timing_diagram}
 \end{figure}
 
 To have a better idea of the different timings, we can suppose we have a network with a throughput of 125 MB/s\footnote{125MB = 131'072'000 bytes.} for data.
-Knowing that each message sent by a node or the master will contain 3 integers (a value and its indices in a matrix) and that an integer is 4 bytes, we can assume that a message takes $9.2 \cdot 10^{-8}$ seconds to be sent\footnote{We neglect the small latency.}.
+Knowing that each message sent by a node or the master will contain n integers (the indices of cities of the best path) and that an integer is 4 bytes, we can assume that a message takes $3.0518 \cdot 10^{-8}$ seconds to be sent\footnote{We neglect the small latency.}.
 
 For the computation time, I ran one iteration of the algorithm with one ant on an *Intel core i5* machine with 4 CPU at 2.60 GHz for a map of 1000 cities.
 It took 0.021076 seconds.
@@ -204,28 +318,28 @@ With these values, we can do some computations to estimate the time for computat
 
 \begin{figure}[!h]
   \begin{center}
-    \begin{tabular}{|c|c|c|c|c|c|}
+    \begin{tabular}{|c|c|}
       \hline
-      \bf nodes /\ ants & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+      \bf nodes $\backslash$ ants & \bf 16\\
       \hline
-      \bf 1   & 63.368182   & 126.596182   & 253.052182   & 505.964182   & 1011.788182\\
+      \bf 1 & 1686.230113000000\\
       \hline
-      \bf 2   & 65.297422   & 65.297422    & 128.525422   & 254.981422   & 507.893422\\
+      \bf 2 & 843.199313000000\\
       \hline
-      \bf 4   & 65.849422   & 65.849422    & 65.849422    & 129.077422   & 255.533422\\
+      \bf 4 & 421.697713000000\\
       \hline
-      \bf 8   & 66.953422   & 66.953422    & 66.953422    & 66.953422    & 130.181422\\
+      \bf 8 & 210.974513000000\\
       \hline
-      \bf 16  & 69.161422   & 69.161422    & 69.161422    & 69.161422    & 69.161422\\
+      \bf 16 & 105.668113000000\\
       \hline
     \end{tabular}
   \end{center}
-  \caption{\it Theoretical computations for 1000 cities and 3000 iterations (30 external iterations and 100 internal ones) based on one machine measurements. The values are computed as follows (in seconds) : $t_{init} + 30 * (\frac{1000^2}{2}-1000) * t_{send} + 100 * (\lceil \frac{n_{ants}}{n_{nodes}}\rceil \cdot t_{computation}) + n_{nodes} \cdot 1000 \cdot t_{send} + t_{merge})$.}
+  \caption{\it Theoretical computations for 1000 cities and 5000 iterations (100 external iterations and 50 internal ones) based on one machine measurements. The values are computed as follows (in seconds) : $t_{init} + 1000^2 * t_{send} + 100 * (50 * (\lceil \frac{n_{ants}}{n_{nodes}}\rceil \cdot t_{computation}) + n_{nodes} \cdot 1000 \cdot t_{send} + t_{merge}) + t_{merge})$.}
   \label{computations}
 \end{figure}
 
 \begin{figure}[!h]
-  \centering \includegraphics[scale=0.75]{img/theoretical_speedup.png}
+  \centering \includegraphics[scale=0.5]{img/theoretical_speedup.png}
   \caption{\it Theoretical speedup for 1000 cities and 3000 iterations (30 * 100) based on figure \ref{computations}.}
   \label{theoretical_speedup}
 \end{figure}
@@ -257,27 +371,33 @@ In this theoretical speedup analysis, we will keep $t_s$ as such\footnote{We add
 With the critical path, we can define $t_p$ as follows :
 
 $$
-t_p = t_{init} + t_l + (\frac{c^2}{2} - c) \cdot t_{send} + \frac{t_s \cdot l}{L} + t_l + n \cdot c \cdot t_{send}
+t_p = t_{init} + t_l + c^2 \cdot t_{send} + L \cdot (t_s \cdot l + t_l + n \cdot c \cdot t_{send})
 $$
 
-where $t_{init}$ is the time to initialize the matrix, $t_l$ is the minimal time to start a transmission, $c$ is the number of cities\footnote{We send only the upper part of the matrix because it is symmetric and the diagonal is null.}, $t_{send}$ is the time to send one element of the matrix, $L$ is the number of *external* iterations in the serial program, $l$ is the number of iterations to process locally in a node before merging to the master and $n$ is the number of nodes (without considering the master).
+where $t_{init}$ is the time to initialize the matrix, $t_l$ is the minimal time to start a transmission, $c$ is the number of cities\footnote{We send only the upper part of the matrix because it is symmetric and the diagonal is null.}, $t_{send}$ is the time to send one element of the matrix, $L$ is the number of *external* iterations in the serial program, $l$ is the number of iterations to process locally in a node before sharing with other nodes and $n$ is the number of nodes.
 
 We can reduce $t_p$ :
 
 $$
-t_p = t_{init} + 2t_l + t_{send} \cdot \frac{c^2 + 2(n-1)c}{2} + \frac{t_s \cdot l}{L}
+t_p = t_{init} + (L + 1) \cdot t_l + t_{send} \cdot (c^2 + n \cdot c \cdot L) + L \cdot l \cdot t_s(n)
 $$
+
+We also can define $t_s$ as :
+
+$$
+t_s(x) = \frac{A}{x} \cdot t_{computation}
+$$
+
+where $x$ is the number of nodes and $A$ the number of ants.
 
 Finally, the speedup is as follows :
 
 $$
-S_n = \frac{t_{init} + t_s}{t_{init} + 2t_l + t_{send} \cdot \frac{c^2 + 2(n-1)c}{2} + \frac{t_s \cdot l}{L}}
+S_n = \frac{t_{init} + L \cdot l \cdot t_s(1)}{t_{init} + (L + 1) \cdot t_l + t_{send} \cdot (c^2 + n \cdot c \cdot L) + L \cdot l \cdot t_s(n)}
 $$
 
-To have good performances, we need to have $t_p$ as small as possible. Ideally, $t_{send}$ should be really small and $l$ should be reasonnably small compared to $L$.
+To have good performances, we need to have $t_p$ as small as possible. Ideally, $t_{send}$ should be really small such that the problem can scale easily.
 
 #### Remarks
 
-We must note that, to compare the serial execution and the parallel execution, we need to have the same number of iterations in the algorithm.
-Indeed, as the termination conditions of the algorithm are a maximum number of iterations or the same best path after a certain number of iteration, the algorithm can converge at different speed (because of the randomness of path choice).
-Thus, to compare improvement of the algorithm, I will only implement the maximum number of loops for termination condition.
+We can note that, in this analysis, we always compare thserial and the parallel implementation when they have exactly the same number of iterations. It allows us to have acceptable results. Nevertheless, we will see in next section that we can have another termination condition which is a certain cost for a path that stays the same for a certain number of iterations (we assume that the result cannot be better in this case). We will observe that some techniques we use to parallelize are not very good in term of result's optimality (even if it as a really good speedup).

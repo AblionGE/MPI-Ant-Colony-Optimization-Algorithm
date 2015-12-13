@@ -43,16 +43,17 @@ while (termination condition) {
 
 There are several problems that can happen with this algorithm :
 
-* The ant can be stuck in a city if the graph is not fully connected.
+* The ant can be stucked in a city if the graph is not fully connected.
     * A possible solution is to kill ants that are in this situation;
     * Another possibility is to transform the graph in a fully connected one with unreasonnable edges for non existing paths\footnote{I chose this solution.}.
 * A suboptimal solution can be found
-    * To solve this, it is sufficient to run the algorithm several times\footnote{As it is not the purpose of this project to have an optimal solution, I will simply run the algorithm once.}.
+    * To solve this, it is sufficient to run the algorithm several times\footnote{With some improvements for the parallel implementation, the optimal solution will possibly not be reached often.}.
 * An isolated city with only one connection to the rest of the graph will make the resolution of the *TSP* impossible.
     * The solution is to assume that each city has at least two connected edges.
 * To parallelize this problem, the exchange of pheromon values can be a bottleneck (lot of communications).
     * A possible solution is to run several iterations locally before sharing the result;
     * Another possibility is to send only the updated values and not all the matrix.
+    * The exchange of informations can be done using broadcasting between all nodes instead of giving all results to the master that will redestribute them to each node.
 
 
 ### Edge selection
@@ -88,7 +89,7 @@ $$
 \label{pheromon_update}
 \end{figure}
 
-where $T^k(t)$ is the best path of ant $k$ at iteration $t$, $L^k(t)$ is the length of the path and $Q$ is a parameter to be defined.
+where $T^k(t)$ is the best path of ant $k$ at iteration $t$, $L^k(t)$ is the length of the path and $Q$\footnote{I choose $Q=1$.} is a parameter to be defined.
 
 ### Representation
 
