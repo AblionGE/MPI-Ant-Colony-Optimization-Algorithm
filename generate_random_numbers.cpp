@@ -18,6 +18,8 @@ int main(int argc, char* argv[]) {
   int* array;
   int i;
 
+  srand(time(NULL));
+
   // Allocation of map
   array = (int*) malloc(size*sizeof(int));
 
