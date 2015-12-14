@@ -21,6 +21,10 @@ EVAPORATION=0.9
 SERIAL="serial_$ROOT.run"
 cd serial
 
+if [ -e $SERIAL ]; then
+  rm $SERIAL
+fi
+
 echo "#!/bin/bash" >> $SERIAL
 echo "#SBATCH --nodes 1" >> $SERIAL
 echo "#SBATCH --ntasks-per-node 1" >> $SERIAL
