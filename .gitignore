@@ -1,6 +1,7 @@
 *~
 *.txt
 *.xml
+result1/
 
 # Created by https://www.gitignore.io/api/c++,latex
 
