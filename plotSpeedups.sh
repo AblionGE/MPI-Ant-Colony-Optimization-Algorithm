@@ -1,13 +1,14 @@
-#!/bin/bash
+#!/bin/zsh
 
 outputfilename_parallel="output_parallel.txt"
 outputfilename_serial="output_serial.txt"
 optimalfile_serial="optimal_serial.txt"
 optimalfile_parallel="optimal_parallel.txt"
 
-for random in $(ls .. | grep random | grep .txt);
+for random in $(ls | grep random | grep .txt);
 do
   RANDOM_FILE="../$random"
+  echo "Processing results for $random"
 
   # ABSOLUTE SPEEDUP
   # Get serial time
@@ -16,18 +17,17 @@ do
   do
     temp=$(cat $results | grep $RANDOM_FILE)
     if [ "$temp" != "" ]; then
-      N=$(head -n 1 $results | wc -w)
-      INDEX=$(head -n 1 | awk -v N=$N '{print $N}')
-      RESULT_FILES_SERIAL[$INDEX]=$results
+      RESULT_FILES_SERIAL=$results
     fi
   done
 
   for file in $RESULT_FILES_SERIAL;
   do
-    N=2
+    N=$(head -n 1 $file | wc -w)
     nodes=$(head -n 1 $file | awk -v N=$N '{print $N}')
-    if [ 1 -eq $nodes ]; then
+    if [ 0 -eq $nodes ]; then
       lastLine=$(tail -1 $file)
+      N=$(tail -n 1 $file | wc -w)
       TRefSerial=$(echo $lastLine | awk -v N=$N '{print $N}')
     fi
   done
@@ -45,7 +45,7 @@ do
       temp=$(cat $results | grep $RANDOM_FILE)
       if [ "$temp" != "" ]; then
         N=$(head -n 1 $results | wc -w)
-        INDEX=$(head -n 1 | awk -v N=$N '{print $N}')
+        INDEX=$(head -n 1 $results | awk -v N=$N '{print $N}')
         RESULT_FILES_PARALLEL[$INDEX]=$results
       fi
     done
@@ -61,8 +61,11 @@ do
     done
 
     # Delete old output file
-    if [ -e $outputfilename ]; then
-      rm $outputfilename
+    if [ -e $outputfilename_serial ]; then
+      rm $outputfilename_serial
+    fi
+    if [ -e $outputfilename_parallel ]; then
+      rm $outputfilename_parallel
     fi
 
     for file in $RESULT_FILES_PARALLEL;
@@ -109,7 +112,7 @@ do
     set output "AbsoluteSpeedup$random.pdf"				# Name of output file
     set ylabel "Absolute Speedup" 			# Label of y axis
     set xlabel "Number of Machines"	# Label of x axis
-    plot '$outputfilename_serial' title "Speedup (local thread in Process)" with linespoints pointtype 5, \
+    plot '$outputfilename_serial' title "Speedup" with linespoints pointtype 5, \
       '$optimalfile_serial' title "Optimal Speedup" with linespoints pointtype 6
 EOF
 
@@ -119,9 +122,11 @@ EOF
     set output "RelativeSpeedup$random.pdf"				# Name of output file
     set ylabel "Relative Speedup" 			# Label of y axis
     set xlabel "Number of Machines"	# Label of x axis
-    plot '$outputfilename_parallel' title "Speedup (local thread in Process)" with linespoints pointtype 5, \
+    plot '$outputfilename_parallel' title "Speedup" with linespoints pointtype 5, \
       '$optimalfile_parallel' title "Optimal Speedup" with linespoints pointtype 6
 EOF
+
+  cd ..
 
   done
 done
