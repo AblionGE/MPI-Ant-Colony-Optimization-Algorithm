@@ -40,6 +40,7 @@ do
   RAND="random$i.txt"
   ./generate_random_numbers $RAND 100000
   ./batch.sh $mapFileName $RAND
+  sleep 1
 done
 
 make clean

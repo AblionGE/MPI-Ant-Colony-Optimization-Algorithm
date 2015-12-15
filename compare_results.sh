@@ -5,15 +5,6 @@ OUTPUT_PARALLEL1="comparison1.txt"
 OUTPUT_PARALLEL2="comparison2.txt"
 OUTPUT_PARALLEL3="comparison3.txt"
 
-# SERIAL_P means Serial is better than P
-# P_SERIAL means P is better than Serial
-SERIAL_P1=0
-P1_SERIAL=0
-SERIAL_P2=0
-P2_SERIAL=0
-SERIAL_P3=0
-P3_SERIAL=0
-
 for random in $(ls . | grep random | grep .txt)
 do
   FILE="../$random"
@@ -26,7 +17,6 @@ do
     if [ "$temp" != "" ]; then
       N=$(head -n 6 $results | tail -n 1 | wc -w)
       SERIALCOST=$(head -n 6 $results | tail -n 1 | awk -v N=$N '{print $N}')
-      echo $SERIALCOST
     fi
   done
   cd ..
@@ -37,18 +27,18 @@ do
     temp=$(cat $results | grep $FILE)
     if [ "$temp" != "" ]; then
       N=$(head -n 1 $results | wc -w)
-      INDEX=$(head -n 1 | awk -v N=$N '{print $N}')
-      SERIAL_P1[$INDEX]=0
+      INDEX=$(head -n 1 $results | awk -v N=$N '{print $N}')
+      SERIALP1[$INDEX]=0
       P1_SERIAL[$INDEX]=0
-      if [ $INDEX -gt $MAX_NODES ]; then
-        $MAX_NODES=$INDEX
+      if [ "$INDEX" -gt "$MAX_NODES" ]; then
+        MAX_NODES=$INDEX
       fi
       N=$(head -n 6 $results | tail -n 1 | wc -w)
       PARALLEL1COST[$INDEX]=$(head -n 6 $results | tail -n 1 | awk -v N=$N '{print $N}')
-      if [ $PARALLEL1COST -gt $SERIALCOST ]; then
-        $SERIAL_P1[$INDEX]=$SERIAL_P1[$INDEX] + 1
-      elif [ $PARALLEL2COST -lt $SERIALCOST ]; then
-        $P1_SERIAL[$INDEX]=$P1_SERIAL[$INDEX] + 1
+      if [ "$PARALLEL1COST[$INDEX]" -gt "$SERIALCOST" ]; then
+        SERIAL_P1[$INDEX]=$SERIAL_P1[$INDEX] + 1
+      elif [ "$PARALLEL1COST[$INDEX]" -lt "$SERIALCOST" ]; then
+        P1_SERIAL[$INDEX]=$P1_SERIAL[$INDEX] + 1
       fi
     fi
   done
@@ -60,18 +50,18 @@ do
     temp=$(cat $results | grep $FILE)
     if [ "$temp" != "" ]; then
       N=$(head -n 1 $results | wc -w)
-      INDEX=$(head -n 1 | awk -v N=$N '{print $N}')
+      INDEX=$(head -n 1 $results | awk -v N=$N '{print $N}')
       SERIAL_P2[$INDEX]=0
       P2_SERIAL[$INDEX]=0
       if [ $INDEX -gt $MAX_NODES ]; then
-        $MAX_NODES=$INDEX
+        MAX_NODES=$INDEX
       fi
       N=$(head -n 6 $results | tail -n 1 | wc -w)
       PARALLEL2COST[$INDEX]=$(head -n 6 $results | tail -n 1 | awk -v N=$N '{print $N}')
-      if [ $PARALLEL2COST -gt $SERIALCOST ]; then
-        $SERIAL_P2[$INDEX]=$SERIAL_P2[$INDEX] + 1
-      elif [ $PARALLEL2COST -lt $SERIALCOST ]; then
-        $P2_SERIAL[$INDEX]=$P2_SERIAL[$INDEX] + 1
+      if [ "$PARALLEL2COST[$INDEX]" -gt "$SERIALCOST" ]; then
+        SERIAL_P2[$INDEX]=$SERIAL_P2[$INDEX] + 1
+      elif [ "$PARALLEL2COST[$INDEX]" -lt "$SERIALCOST" ]; then
+        P2_SERIAL[$INDEX]=$P2_SERIAL[$INDEX] + 1
       fi
     fi
   done
@@ -83,18 +73,18 @@ do
     temp=$(cat $results | grep $FILE)
     if [ "$temp" != "" ]; then
       N=$(head -n 1 $results | wc -w)
-      INDEX=$(head -n 1 | awk -v N=$N '{print $N}')
+      INDEX=$(head -n 1 $results | awk -v N=$N '{print $N}')
       SERIAL_P3[$INDEX]=0
       P3_SERIAL[$INDEX]=0
       if [ $INDEX -gt $MAX_NODES ]; then
-        $MAX_NODES=$INDEX
+        MAX_NODES=$INDEX
       fi
       N=$(head -n 6 $results | tail -n 1 | wc -w)
       PARALLEL3COST[$INDEX]=$(head -n 6 $results | tail -n 1 | awk -v N=$N '{print $N}')
-      if [ $PARALLEL3COST -gt $SERIALCOST ]; then
-        $SERIAL_P3[$INDEX]=$SERIAL_P3[$INDEX] + 1
-      elif [ $PARALLEL2COST -lt $SERIALCOST ]; then
-        $P3_SERIAL[$INDEX]=$P3_SERIAL[$INDEX] + 1
+      if [ "$PARALLEL3COST[$INDEX]" -gt "$SERIALCOST" ]; then
+        SERIAL_P3[$INDEX]=$SERIAL_P3[$INDEX] + 1
+      elif [ "$PARALLEL2COST[$INDEX]" -lt "$SERIALCOST" ]; then
+        P3_SERIAL[$INDEX]=$P3_SERIAL[$INDEX] + 1
       fi
     fi
   done
