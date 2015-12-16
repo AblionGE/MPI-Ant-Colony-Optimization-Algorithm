@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
   int *bestPath;
   int *currentPath;
   long bestCost = INFTY;
-  int* randomNumbers;
+  long* randomNumbers;
 
   char* mapFile = argv[1];
   char* randomFile = argv[2];
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
   nRandomNumbers = atoi(out);
 
   // Allocation of random numbers vector
-  randomNumbers = (int*) malloc(nRandomNumbers*sizeof(int));
+  randomNumbers = (long*) malloc(nRandomNumbers*sizeof(long));
 
   i = 0;
   while (!in.eof()) {
