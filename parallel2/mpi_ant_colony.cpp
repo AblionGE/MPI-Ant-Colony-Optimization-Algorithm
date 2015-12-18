@@ -257,7 +257,17 @@ int main(int argc, char* argv[]) {
     totalNAnts += nAntsPerNode[i];
   }
 
-  random_counter = (random_counter + (onNodeIteration * prank)) % nRandomNumbers;
+
+  int nAntsBeforeMe = 0;
+  for (i = 0; i < psize; i++) {
+    if (i < prank) {
+      nAntsBeforeMe += nAntsPerNode[i];
+    } else {
+      i = psize;
+    }
+  }
+
+  random_counter = (random_counter + (onNodeIteration * nAntsBeforeMe)) % nRandomNumbers;
 
   while (external_loop_counter < externalIterations && terminationCondition < (int) ceilf(totalNAnts * externalIterations * onNodeIteration * terminationConditionPercentage)) {
     loop_counter = 0;
@@ -388,7 +398,7 @@ int main(int argc, char* argv[]) {
     external_loop_counter++;
 
     // 2 times because we used twice a random number
-    random_counter = (random_counter + (2 * onNodeIteration * (psize - 1))) % nRandomNumbers;
+    random_counter = (random_counter + (2 * onNodeIteration * (totalNAnts - nAnts))) % nRandomNumbers;
   }
 
   // Merge solution into root 

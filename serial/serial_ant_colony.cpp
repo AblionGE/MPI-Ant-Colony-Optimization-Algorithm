@@ -123,13 +123,15 @@ int main(int argc, char* argv[]) {
       }
 
       // select a random start city for an ant
-      int currentCity = randomNumbers[random_counter] % nCities;
+      long rand = randomNumbers[random_counter];
+      int currentCity = rand % nCities;
       random_counter = (random_counter + 1) % nRandomNumbers;
       // currentPath will contain the order of visited cities
       currentPath[currentCity] = 0;
       for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
         // Find next city
-        currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, randomNumbers[random_counter]);
+        rand = randomNumbers[random_counter];
+        currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, rand);
         random_counter = (random_counter + 1) % nRandomNumbers;
 
 
