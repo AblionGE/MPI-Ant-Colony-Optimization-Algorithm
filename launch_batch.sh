@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 4 ]; then
-  echo "usage $0 mapFileName sizeOfMap maxDistance nbOfRandomFiles"
+if [ "$#" -ne 7 ]; then
+  echo "usage $0 mapFileName sizeOfMap maxDistance nbOfRandomFiles nbOfAnts InternalLoops ExternalLoops"
   exit 1
 fi
 
@@ -9,6 +9,9 @@ mapFileName=$1
 sizeOfMap=$2
 maxDistance=$3
 loops=$4
+nAnts=$5
+internal=$6
+external=$7
 
 # Compile codes
 
@@ -43,7 +46,7 @@ for i in $(seq $loops)
 do
   RAND="random$i.txt"
   ./generate_random_numbers $RAND 100000
-  ./batch.sh $mapFileName $RAND
+  ./batch.sh $mapFileName $RAND $nAnts $internal $external
   sleep 1
 done
 

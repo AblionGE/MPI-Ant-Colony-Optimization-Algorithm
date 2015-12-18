@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]; then
-  echo "usage $0 mapFile randomFile"
+if [ "$#" -ne 5 ]; then
+  echo "usage $0 mapFile randomFile nbOfAnts nbOfInternalLoops nbOfExternalLoops"
   exit 1
 fi
 
@@ -9,10 +9,10 @@ mapFile=$1
 randomFile=$2
 
 ROOT="ant_colony"
-NB_ANTS=32
-NB_INTERNAL_LOOP=100
-NB_EXTERNAL_LOOP=100
-NB_TOTAL_LOOP=10000
+NB_ANTS=$3
+NB_INTERNAL_LOOP=$4
+NB_EXTERNAL_LOOP=$5
+NB_TOTAL_LOOP=$(echo "$4*$5" | bc)
 ALPHA=1
 BETA=1
 EVAPORATION=0.9
