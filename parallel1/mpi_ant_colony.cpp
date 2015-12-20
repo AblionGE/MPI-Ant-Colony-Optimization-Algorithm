@@ -246,7 +246,7 @@ int main(int argc, char* argv[]) {
     bestPath[i] = -1;
   }
   for (i = 0; i < nCities * nCities; i++) {
-    pheromons[i] = 1;
+    pheromons[i] = 0.1;
   }
 
   nAnts = nAntsPerNode[prank];

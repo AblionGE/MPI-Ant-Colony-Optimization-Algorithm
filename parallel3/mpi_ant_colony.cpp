@@ -319,7 +319,7 @@ int main(int argc, char* argv[]) {
     }
 
     for (j = 0; j < nCities*nCities; j++) {
-      pheromonsUpdate[j] = 1.0;
+      pheromonsUpdate[j] = 0.1;
     }
     long tempBestCost = bestCost;
     int* tempBestPath = (int*) malloc(nCities * sizeof(int));

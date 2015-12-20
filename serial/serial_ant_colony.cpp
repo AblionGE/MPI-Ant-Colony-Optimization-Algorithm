@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
     bestPath[i] = -1;
   }
   for (j = 0; j < nCities*nCities; j++) {
-    pheromons[j] = 1;
+    pheromons[j] = 0.1;
   }
 
   loop_counter = 0;
