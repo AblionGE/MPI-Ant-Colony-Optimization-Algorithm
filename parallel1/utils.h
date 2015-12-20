@@ -196,10 +196,18 @@ void updatePheromons(float* pheromons, int* path, long cost, int nCities) {
   for (i = 0; i < nCities - 1; i++) {
     pheromons[getMatrixIndex(orderedCities[i],orderedCities[i + 1], nCities)] += 1.0/cost;
     pheromons[getMatrixIndex(orderedCities[i + 1],orderedCities[i], nCities)] += 1.0/cost;
+    if (pheromons[getMatrixIndex(orderedCities[i],orderedCities[i + 1], nCities)] > 1) {
+      pheromons[getMatrixIndex(orderedCities[i],orderedCities[i + 1], nCities)] = 1.0;
+      pheromons[getMatrixIndex(orderedCities[i + 1],orderedCities[i], nCities)] = 1.0;
+    }
   }
   // add last
   pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] += 1.0/cost;
   pheromons[getMatrixIndex(orderedCities[0],orderedCities[nCities - 1], nCities)] += 1.0/cost;
+  if (pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] > 1.0) {
+    pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] = 1.0;
+    pheromons[getMatrixIndex(orderedCities[0],orderedCities[nCities - 1], nCities)] = 1.0;
+  }
 }
 
 #if __linux__ 
