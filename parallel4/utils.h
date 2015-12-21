@@ -206,7 +206,7 @@ void updatePheromons(float* pheromons, int* path, long cost, int nCities) {
   pheromons[getMatrixIndex(orderedCities[0],orderedCities[nCities - 1], nCities)] += 1.0/cost;
   if (pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] > 1.0) {
     pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] = 1.0;
-    pheromons[getMatrixIndex(orderedCities[nCities - 1],orderedCities[0],nCities)] = 1.0;
+    pheromons[getMatrixIndex(orderedCities[0],orderedCities[nCities - 1], nCities)] = 1.0;
   }
 }
 
