@@ -108,6 +108,7 @@ int main(int argc, char* argv[]) {
   }
 
   loop_counter = 0;
+  long antsBestCost = INFTY;
 
   // External loop
   while (loop_counter < iterations && terminationCondition < (int) ceilf(nAnts * iterations * terminationConditionPercentage)) {
@@ -150,12 +151,16 @@ int main(int argc, char* argv[]) {
 
       if (oldCost > bestCost) {
         copyVectorInt(currentPath, bestPath, nCities);
-        terminationCondition = 0;
-      } else {
-        terminationCondition++;
       }
     }
-    //
+
+    if (bestCost < antsBestCost) {
+      antsBestCost = bestCost;
+      terminationCondition = 0;
+    } else {
+      terminationCondition++;
+    }
+
     // Pheromon evaporation
     for (i = 0; i < nCities; i++) {
       for (j = i + 1; j < nCities; j++) {

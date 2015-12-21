@@ -265,6 +265,8 @@ int main(int argc, char* argv[]) {
 
   random_counter = (random_counter + (onNodeIteration * nAntsBeforeMe)) % nRandomNumbers;
 
+  long antsBestCost = INFTY;
+
   while (external_loop_counter < externalIterations) {
     loop_counter = 0;
     while (loop_counter < onNodeIteration) {
@@ -306,11 +308,15 @@ int main(int argc, char* argv[]) {
         bestCost = updateBestPath(bestCost, bestPath, currentPath, map, nCities);
 
         if (oldCost > bestCost) {
-          terminationCondition = 0;
           copyVectorInt(currentPath, bestPath, nCities);
-        } else {
-          terminationCondition++;
         }
+      }
+
+      if (bestCost < antsBestCost) {
+        antsBestCost = bestCost;
+        terminationCondition = 0;
+      } else {
+        terminationCondition++;
       }
 
       // Pheromon evaporation
