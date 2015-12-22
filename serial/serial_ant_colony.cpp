@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
   float beta = atof(argv[6]);
   float evaporationCoeff = atof(argv[7]);
   int nCities = 0;
-  int nRandomNumbers = 0;
+  long nRandomNumbers = 0;
   int terminationCondition = 0;
   float terminationConditionPercentage = 0.4;
 
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
   in >> out;
 
   // Define number of random numbers
-  nRandomNumbers = atoi(out);
+  nRandomNumbers = atol(out);
 
   // Allocation of random numbers vector
   randomNumbers = (long*) malloc(nRandomNumbers*sizeof(long));
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
   long antsBestCost = INFTY;
 
   // External loop
-  while (loop_counter < iterations && terminationCondition < (int) ceilf(nAnts * iterations * terminationConditionPercentage)) {
+  while (loop_counter < iterations && terminationCondition < (long) ceilf(nAnts * iterations * terminationConditionPercentage)) {
 
     // printf("Loop nr. : %d\n", loop_counter);
 
