@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
   int *bestPath;
   int *otherBestPath;
   int *currentPath;
-  int bestCost = INFTY;
-  int otherBestCost;
+  long bestCost = INFTY;
+  long otherBestCost;
   float* localPheromonsPath;
   float* otherPheromonsPath;
 
@@ -308,7 +308,7 @@ int main(int argc, char* argv[]) {
         }
 
         // update bestCost and bestPath
-        int oldCost = bestCost;
+        long oldCost = bestCost;
         bestCost = updateBestPath(bestCost, bestPath, currentPath, map, nCities);
 
         if (oldCost > bestCost) {
@@ -338,7 +338,7 @@ int main(int argc, char* argv[]) {
     for (j = 0; j < nCities*nCities; j++) {
       pheromonsUpdate[j] = 1;
     }
-    int tempBestCost = bestCost;
+    long tempBestCost = bestCost;
     int* tempBestPath = (int*) malloc(nCities * sizeof(int));
     int tempTerminationCondition = terminationCondition;
     copyVectorInt(bestPath, tempBestPath, nCities);
@@ -364,7 +364,7 @@ int main(int argc, char* argv[]) {
         MPI_Finalize();
         return -1;
       }
-      if (MPI_Bcast(&otherBestCost, 1, MPI_INT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
+      if (MPI_Bcast(&otherBestCost, 1, MPI_LONG, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
         printf("Node %d : Error in Broadcast of otherTerminationCondition", prank);
         MPI_Finalize();
         return -1;
@@ -415,7 +415,7 @@ int main(int argc, char* argv[]) {
         MPI_Finalize();
         return -1;
       }
-      int oldCost = bestCost;
+      long oldCost = bestCost;
       bestCost = updateBestPath(bestCost, bestPath, otherBestPath, map, nCities);
 
       if (oldCost > bestCost) {
@@ -433,7 +433,7 @@ int main(int argc, char* argv[]) {
 
   if (prank == 0) {
     // printPath(bestPath, nCities);
-    printf("best cost : %d\n", bestCost);
+    printf("best cost : %ld\n", bestCost);
   }
 
   if (prank == 0) {
