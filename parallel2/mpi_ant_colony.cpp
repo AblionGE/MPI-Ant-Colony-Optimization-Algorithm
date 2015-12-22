@@ -53,8 +53,8 @@ int main(int argc, char* argv[]) {
   float evaporationCoeff; 
   int nCities = 0;
   int* nAntsPerNode;
-  int terminationCondition = 0;
-  int otherTerminationCondition = 0;
+  long terminationCondition = 0;
+  long otherTerminationCondition = 0;
   float terminationConditionPercentage = 0.4;
 
   // share random file first
@@ -271,7 +271,7 @@ int main(int argc, char* argv[]) {
 
   long antsBestCost = INFTY;
 
-  while (external_loop_counter < externalIterations && terminationCondition < (int) ceilf(totalNAnts * externalIterations * onNodeIteration * terminationConditionPercentage)) {
+  while (external_loop_counter < externalIterations && terminationCondition < (long) ceilf(totalNAnts * externalIterations * onNodeIteration * terminationConditionPercentage)) {
     loop_counter = 0;
     while (loop_counter < onNodeIteration) {
 
@@ -340,7 +340,7 @@ int main(int argc, char* argv[]) {
     }
     long tempBestCost = bestCost;
     int* tempBestPath = (int*) malloc(nCities * sizeof(int));
-    int tempTerminationCondition = terminationCondition;
+    long tempTerminationCondition = terminationCondition;
     copyVectorInt(bestPath, tempBestPath, nCities);
     for (i = 0; i < psize; i++) {
       if (prank == i) {
@@ -359,13 +359,13 @@ int main(int argc, char* argv[]) {
         MPI_Finalize();
         return -1;
       }
-      if (MPI_Bcast(&otherTerminationCondition, 1, MPI_INT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
+      if (MPI_Bcast(&otherTerminationCondition, 1, MPI_LONG, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
         printf("Node %d : Error in Broadcast of otherTerminationCondition", prank);
         MPI_Finalize();
         return -1;
       }
       if (MPI_Bcast(&otherBestCost, 1, MPI_LONG, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
-        printf("Node %d : Error in Broadcast of otherTerminationCondition", prank);
+        printf("Node %d : Error in Broadcast of otherBestCost", prank);
         MPI_Finalize();
         return -1;
       }

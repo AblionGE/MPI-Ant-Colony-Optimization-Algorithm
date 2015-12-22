@@ -51,8 +51,8 @@ int main(int argc, char* argv[]) {
   float evaporationCoeff; 
   int nCities = 0;
   int* nAntsPerNode;
-  int terminationCondition = 0;
-  int otherTerminationCondition = 0;
+  long terminationCondition = 0;
+  long otherTerminationCondition = 0;
 
   // share random file first
   if (prank == 0) {
@@ -318,8 +318,7 @@ int main(int argc, char* argv[]) {
       } else {
         terminationCondition++;
       }
-
-      // Pheromon evaporation
+      long// Pheromon evaporation
       for (i = 0; i < nCities * nCities; i++) {
         pheromons[i] *= evaporationCoeff;
       }
@@ -342,7 +341,7 @@ int main(int argc, char* argv[]) {
       if (prank == i) {
         copyVectorInt(bestPath, otherBestPath, nCities);
         copyVectorFloat(localPheromonsPath, otherPheromonsPath, nCities);
-        otherTerminationCondition = terminationCondition;
+        long = terminationCondition;
         otherBestCost = bestCost;
       }
       if (MPI_Bcast(&otherBestPath[0], nCities, MPI_INT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
@@ -361,7 +360,7 @@ int main(int argc, char* argv[]) {
         return -1;
       }
       if (MPI_Bcast(&otherBestCost, 1, MPI_LONG, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
-        printf("Node %d : Error in Broadcast of otherTerminationCondition", prank);
+        printf("Node %d : Error in Broadcast of otherBestCost", prank);
         MPI_Finalize();
         return -1;
       }
