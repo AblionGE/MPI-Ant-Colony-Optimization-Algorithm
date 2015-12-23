@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
   float evaporationCoeff = atof(argv[7]);
   int nCities = 0;
   long nRandomNumbers = 0;
-  int terminationCondition = 0;
+  long terminationCondition = 0;
   float terminationConditionPercentage = 0.4;
 
   printf("RandomFile %s\n", randomFile);
@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
   // External loop
   while (loop_counter < iterations && terminationCondition < (long) ceilf(nAnts * iterations * terminationConditionPercentage)) {
 
-    // printf("Loop nr. : %d\n", loop_counter);
+    printf("Loop nr. : %d, terminationCondition : %ld,, bestCost : %ld\n", loop_counter, terminationCondition,bestCost);
 
     // Loop over each ant
     for (ant_counter = 0; ant_counter < nAnts; ant_counter++) {
@@ -162,11 +162,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Pheromon evaporation
-    for (i = 0; i < nCities; i++) {
-      for (j = i + 1; j < nCities; j++) {
-        pheromons[getMatrixIndex(i,j,nCities)] *= evaporationCoeff;
-        pheromons[getMatrixIndex(j,i,nCities)] *= evaporationCoeff;
-      }
+    for (j = 0; j < nCities*nCities; j++) {
+      pheromons[j] *= evaporationCoeff;
     }
     // Update pheromons
     updatePheromons(pheromons, bestPath, bestCost, nCities);
@@ -188,5 +185,4 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-
 

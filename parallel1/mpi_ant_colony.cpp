@@ -268,12 +268,14 @@ int main(int argc, char* argv[]) {
 
   long antsBestCost = INFTY;
 
+  printf("%ld\n",(long) ceilf(totalNAnts * externalIterations * onNodeIteration * terminationConditionPercentage)); 
+
   while (external_loop_counter < externalIterations && terminationCondition < (long) ceilf(totalNAnts * externalIterations * onNodeIteration * terminationConditionPercentage)) {
 
     loop_counter = 0;
     while (loop_counter < onNodeIteration) {
 
-      // printf("Loop nr. : %d in node %d\n", loop_counter, prank);
+      printf("Loop nr. : %d in node %d, terminationCondition : %ld, bestCost : %ld\n", external_loop_counter, prank, terminationCondition,bestCost);
 
       // Loop over each ant
       for (ant_counter = 0; ant_counter < nAnts; ant_counter++) {
