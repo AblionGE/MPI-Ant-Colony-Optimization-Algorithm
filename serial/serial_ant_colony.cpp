@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
   float terminationConditionPercentage = 0.4;
 
   printf("RandomFile %s\n", randomFile);
-  printf("Iterations %d\n", iterations);
+  printf("Iterations %ld\n", iterations);
   printf("Ants %d\n", nAnts);
 
   start = second();

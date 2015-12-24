@@ -265,7 +265,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  random_counter = (random_counter + (onNodeIteration * nAntsBeforeMe * nCities) % nRandomNumbers;
+  random_counter = (random_counter + (onNodeIteration * nAntsBeforeMe * nCities)) % nRandomNumbers;
 
   long antsBestCost = INFTY;
 
@@ -276,7 +276,7 @@ int main(int argc, char* argv[]) {
     loop_counter = 0;
     while (loop_counter < onNodeIteration) {
 
-      printf("Loop nr. : %d in node %d, terminationCondition : %ld, bestCost : %ld\n", external_loop_counter, prank, terminationCondition,bestCost);
+      printf("Loop nr. : %ld in node %d, terminationCondition : %ld, bestCost : %ld\n", external_loop_counter, prank, terminationCondition,bestCost);
 
       // Loop over each ant
       for (ant_counter = 0; ant_counter < nAnts; ant_counter++) {
@@ -301,7 +301,7 @@ int main(int argc, char* argv[]) {
           random_counter = (random_counter + 1) % nRandomNumbers;
 
           if (currentCity == -1) {
-            printf("There is an error choosing the next city in iteration %d for ant %d on node %d\n", loop_counter, ant_counter, prank);
+            printf("There is an error choosing the next city in iteration %ld for ant %d on node %d\n", loop_counter, ant_counter, prank);
             MPI_Finalize();
             return -1;
           }
@@ -406,7 +406,7 @@ int main(int argc, char* argv[]) {
 
     external_loop_counter++;
 
-    random_counter = (random_counter + (onNodeIteration * (totalNAnts - nAnts) * nCities) % nRandomNumbers;
+    random_counter = (random_counter + (onNodeIteration * (totalNAnts - nAnts) * nCities)) % nRandomNumbers;
   }
 
   // Merge solution into root 
