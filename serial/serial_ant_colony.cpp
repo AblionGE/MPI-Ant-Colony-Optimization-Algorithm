@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
   printf("NbOfAgents 0\n");
 
   int i, j, loop_counter, ant_counter, cities_counter;
-  int random_counter = 0;
+  long random_counter = 0;
   int *map = NULL;
   float *pheromons;
   // bestPath is a vector representing all cities in order.
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
   char* mapFile = argv[1];
   char* randomFile = argv[2];
   int nAnts = atoi(argv[3]);;
-  int iterations = atoi(argv[4]);
+  long iterations = atol(argv[4]);
   float alpha = atof(argv[5]);
   float beta = atof(argv[6]);
   float evaporationCoeff = atof(argv[7]);

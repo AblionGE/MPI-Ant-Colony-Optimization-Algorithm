@@ -21,9 +21,10 @@ int main(int argc, char* argv[]) {
     printf("NbOfNodes %d\n", psize);
   }
 
-  int i, j, loop_counter, ant_counter, cities_counter;
-  int random_counter = 0;
-  int external_loop_counter = 0;
+  int i, j, ant_counter, cities_counter;
+  long loop_counter;
+  long random_counter = 0;
+  long external_loop_counter = 0;
   int *map = NULL;
   float *pheromons;
   int* pheromonsUpdate;
@@ -44,8 +45,8 @@ int main(int argc, char* argv[]) {
   char* mapFile;
   char* randomFile;
   int nAnts; 
-  int externalIterations; 
-  int onNodeIteration; 
+  long externalIterations; 
+  long onNodeIteration; 
   float alpha; 
   float beta; 
   float evaporationCoeff; 
@@ -137,7 +138,7 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    printf("Iterations %d\n", externalIterations*onNodeIteration);
+    printf("Iterations %ld\n", externalIterations*onNodeIteration);
     printf("Ants %d\n", nAnts);
   }
 
@@ -147,12 +148,12 @@ int main(int argc, char* argv[]) {
     MPI_Finalize();
     return -1;
   }
-  if (MPI_Bcast(&onNodeIteration, 1, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+  if (MPI_Bcast(&onNodeIteration, 1, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
     printf("Node %d : Error in Broadcast of onNodeIteration", prank);
     MPI_Finalize();
     return -1;
   }
-  if (MPI_Bcast(&externalIterations, 1, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+  if (MPI_Bcast(&externalIterations, 1, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
     printf("Node %d : Error in Broadcast of externalIterations", prank);
     MPI_Finalize();
     return -1;
