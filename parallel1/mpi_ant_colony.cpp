@@ -265,7 +265,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  random_counter = (random_counter + (onNodeIteration * nAntsBeforeMe)) % nRandomNumbers;
+  random_counter = (random_counter + (onNodeIteration * nAntsBeforeMe * nCities) % nRandomNumbers;
 
   long antsBestCost = INFTY;
 
@@ -288,6 +288,7 @@ int main(int argc, char* argv[]) {
 
         // select a random start city for an ant
         long rand = randomNumbers[random_counter];
+        printf("random currentCity %ld\n", rand);
         int currentCity = rand % nCities;
         random_counter = (random_counter + 1) % nRandomNumbers;
         // currentPath will contain the order of visited cities
@@ -295,6 +296,7 @@ int main(int argc, char* argv[]) {
         for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
           // Find next city
           rand = randomNumbers[random_counter];
+          printf("random nextCity : %ld\n", rand);
           currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, rand);
           random_counter = (random_counter + 1) % nRandomNumbers;
 
@@ -404,8 +406,7 @@ int main(int argc, char* argv[]) {
 
     external_loop_counter++;
 
-    // 2 times because we used twice a random number
-    random_counter = (random_counter + (2 * onNodeIteration * (totalNAnts - nAnts))) % nRandomNumbers;
+    random_counter = (random_counter + (onNodeIteration * (totalNAnts - nAnts) * nCities) % nRandomNumbers;
   }
 
   // Merge solution into root 
