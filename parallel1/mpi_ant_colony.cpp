@@ -296,7 +296,6 @@ int main(int argc, char* argv[]) {
         for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
           // Find next city
           rand = randomNumbers[random_counter];
-          printf("random nextCity : %ld\n", rand);
           currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, rand);
           random_counter = (random_counter + 1) % nRandomNumbers;
 
