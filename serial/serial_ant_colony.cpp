@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
   int i, j, loop_counter, ant_counter, cities_counter;
   long random_counter = 0;
   int *map = NULL;
-  float *pheromons;
+  double *pheromons;
   // bestPath is a vector representing all cities in order.
   // If the value is 0, the city was not visited
   // else, the city is visited at step i
@@ -25,13 +25,13 @@ int main(int argc, char* argv[]) {
   char* randomFile = argv[2];
   int nAnts = atoi(argv[3]);;
   long iterations = atol(argv[4]);
-  float alpha = atof(argv[5]);
-  float beta = atof(argv[6]);
-  float evaporationCoeff = atof(argv[7]);
+  double alpha = atof(argv[5]);
+  double beta = atof(argv[6]);
+  double evaporationCoeff = atof(argv[7]);
   int nCities = 0;
   long nRandomNumbers = 0;
   long terminationCondition = 0;
-  float terminationConditionPercentage = 0.4;
+  double terminationConditionPercentage = 0.4;
 
   printf("RandomFile %s\n", randomFile);
   printf("Iterations %ld\n", iterations);
@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
 
 
   // Allocation of pheromons
-  pheromons = (float*) malloc(nCities*nCities*sizeof(float));
+  pheromons = (double*) malloc(nCities*nCities*sizeof(double));
 
   bestPath = (int*) malloc(nCities*sizeof(int));
   currentPath = (int*) malloc(nCities*sizeof(int));
@@ -125,8 +125,8 @@ int main(int argc, char* argv[]) {
 
       // select a random start city for an ant
       long rand = randomNumbers[random_counter];
-      printf("random currentCity : %ld\n", rand);
       int currentCity = rand % nCities;
+      printf("%d\n", currentCity);
       random_counter = (random_counter + 1) % nRandomNumbers;
       // currentPath will contain the order of visited cities
       currentPath[currentCity] = 0;
@@ -134,6 +134,7 @@ int main(int argc, char* argv[]) {
         // Find next city
         rand = randomNumbers[random_counter];
         currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, rand);
+        printf("%d\n", currentCity);
         random_counter = (random_counter + 1) % nRandomNumbers;
 
 

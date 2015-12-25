@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
   long random_counter = 0;
   long external_loop_counter = 0;
   int *map = NULL;
-  float *pheromons;
+  double *pheromons;
   int* pheromonsUpdate;
   // bestPath is a vector representing all cities in order.
   // If the value is 0, the city was not visited
@@ -36,8 +36,8 @@ int main(int argc, char* argv[]) {
   int *currentPath;
   long bestCost = INFTY;
   long otherBestCost;
-  float* localPheromonsPath;
-  float* otherPheromonsPath;
+  double* localPheromonsPath;
+  double* otherPheromonsPath;
 
   long* randomNumbers;
   long nRandomNumbers = 0;
@@ -47,14 +47,14 @@ int main(int argc, char* argv[]) {
   int nAnts; 
   long externalIterations; 
   long onNodeIteration; 
-  float alpha; 
-  float beta; 
-  float evaporationCoeff; 
+  double alpha; 
+  double beta; 
+  double evaporationCoeff; 
   int nCities = 0;
   int* nAntsPerNode;
   long terminationCondition = 0;
   long otherTerminationCondition = 0;
-  float terminationConditionPercentage = 0.4;
+  double terminationConditionPercentage = 0.4;
 
   // share random file first
   if (prank == 0) {
@@ -80,6 +80,10 @@ int main(int argc, char* argv[]) {
 
     // Allocation of random numbers vector
     randomNumbers = (long*) malloc(nRandomNumbers*sizeof(long));
+
+    for (i = 0; i < nRandomNumbers; i++) {
+      randomNumbers[i] = 0;
+    }
 
     i = 0;
     while(!in.eof()) {
@@ -140,41 +144,7 @@ int main(int argc, char* argv[]) {
 
     printf("Iterations %ld\n", externalIterations*onNodeIteration);
     printf("Ants %d\n", nAnts);
-  }
 
-  // And then it shares values with other nodes
-  if (MPI_Bcast(&nAntsPerNode[0], psize, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
-    printf("Node %d : Error in Broadcast of nAntsPerNode", prank);
-    MPI_Finalize();
-    return -1;
-  }
-  if (MPI_Bcast(&onNodeIteration, 1, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
-    printf("Node %d : Error in Broadcast of onNodeIteration", prank);
-    MPI_Finalize();
-    return -1;
-  }
-  if (MPI_Bcast(&externalIterations, 1, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
-    printf("Node %d : Error in Broadcast of externalIterations", prank);
-    MPI_Finalize();
-    return -1;
-  }
-  if (MPI_Bcast(&alpha, 1, MPI_FLOAT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
-    printf("Node %d : Error in Broadcast of alpha", prank);
-    MPI_Finalize();
-    return -1;
-  }
-  if (MPI_Bcast(&beta, 1, MPI_FLOAT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
-    printf("Node %d : Error in Broadcast of beta", prank);
-    MPI_Finalize();
-    return -1;
-  }
-  if (MPI_Bcast(&evaporationCoeff, 1, MPI_FLOAT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
-    printf("Node %d : Error in Broadcast of evaporationCoeff", prank);
-    MPI_Finalize();
-    return -1;
-  }
-
-  if (prank == 0) {
     // Load the map and the number of cities
     std::ifstream in;
     in.open(mapFile);
@@ -200,13 +170,46 @@ int main(int argc, char* argv[]) {
 
     // Load the map inside map variable
     if (LoadCities(mapFile, map)) {
-      printf("The filepath %s is incorrect\n", mapFile);
+      printf("The filepath is incorrect\n");
       MPI_Finalize();
       return -1;
     }
 
     // printf("Number of cities : %d\n", nCities);
   }
+
+  // And then it shares values with other nodes
+  if (MPI_Bcast(&nAntsPerNode[0], psize, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    printf("Node %d : Error in Broadcast of nAntsPerNode", prank);
+    MPI_Finalize();
+    return -1;
+  }
+  if (MPI_Bcast(&onNodeIteration, 1, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    printf("Node %d : Error in Broadcast of onNodeIteration", prank);
+    MPI_Finalize();
+    return -1;
+  }
+  if (MPI_Bcast(&externalIterations, 1, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    printf("Node %d : Error in Broadcast of externalIterations", prank);
+    MPI_Finalize();
+    return -1;
+  }
+  if (MPI_Bcast(&alpha, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    printf("Node %d : Error in Broadcast of alpha", prank);
+    MPI_Finalize();
+    return -1;
+  }
+  if (MPI_Bcast(&beta, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    printf("Node %d : Error in Broadcast of beta", prank);
+    MPI_Finalize();
+    return -1;
+  }
+  if (MPI_Bcast(&evaporationCoeff, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+    printf("Node %d : Error in Broadcast of evaporationCoeff", prank);
+    MPI_Finalize();
+    return -1;
+  }
+
 
   // Share number of cities
   if (MPI_Bcast(&nCities, 1, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
@@ -228,12 +231,12 @@ int main(int argc, char* argv[]) {
   }
 
   // Allocation of pheromons
-  pheromons = (float*) malloc(nCities*nCities*sizeof(float));
+  pheromons = (double*) malloc(nCities*nCities*sizeof(double));
   pheromonsUpdate = (int*) malloc(nCities*nCities*sizeof(int));
-  localPheromonsPath = (float*) malloc(nCities*sizeof(float));
+  localPheromonsPath = (double*) malloc(nCities*sizeof(double));
 
   otherBestPath = (int*) malloc(nCities*sizeof(int));
-  otherPheromonsPath = (float*) malloc(nCities*sizeof(float));
+  otherPheromonsPath = (double*) malloc(nCities*sizeof(double));
   for (i = 0; i < nCities; i++) {
     otherBestPath[i] = -1;
   }
@@ -288,16 +291,17 @@ int main(int argc, char* argv[]) {
 
         // select a random start city for an ant
         long rand = randomNumbers[random_counter];
-        printf("random currentCity %ld\n", rand);
         int currentCity = rand % nCities;
+        printf("%d\n", currentCity);
         random_counter = (random_counter + 1) % nRandomNumbers;
         // currentPath will contain the order of visited cities
         currentPath[currentCity] = 0;
         for (cities_counter = 1; cities_counter < nCities; cities_counter++) {
           // Find next city
           rand = randomNumbers[random_counter];
-          currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, rand);
           random_counter = (random_counter + 1) % nRandomNumbers;
+          currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, rand);
+          printf("%d\n", currentCity);
 
           if (currentCity == -1) {
             printf("There is an error choosing the next city in iteration %ld for ant %d on node %d\n", loop_counter, ant_counter, prank);
@@ -347,7 +351,7 @@ int main(int argc, char* argv[]) {
     for (i = 0; i < psize; i++) {
       if (prank == i) {
         copyVectorInt(bestPath, otherBestPath, nCities);
-        copyVectorFloat(localPheromonsPath, otherPheromonsPath, nCities);
+        copyVectordouble(localPheromonsPath, otherPheromonsPath, nCities);
         otherTerminationCondition = terminationCondition;
         otherBestCost = bestCost;
       }
@@ -356,7 +360,7 @@ int main(int argc, char* argv[]) {
         MPI_Finalize();
         return -1;
       }
-      if (MPI_Bcast(&otherPheromonsPath[0], nCities, MPI_FLOAT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
+      if (MPI_Bcast(&otherPheromonsPath[0], nCities, MPI_DOUBLE, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
         printf("Node %d : Error in Broadcast of otherPheromonsPath", prank);
         MPI_Finalize();
         return -1;
