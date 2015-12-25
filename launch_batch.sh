@@ -45,7 +45,7 @@ fi
 for i in $(seq $loops)
 do
   RAND="random$i.txt"
-  ./generate_random_numbers $RAND 100000
+  ./generate_random_numbers $RAND 10000
   ./batch.sh $mapFileName $RAND $nAnts $internal $external
   sleep 1
 done
