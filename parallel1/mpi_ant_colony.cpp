@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
   long external_loop_counter = 0;
   int *map = NULL;
   double *pheromons;
-  int* pheromonsUpdate;
+  double* pheromonsUpdate;
   // bestPath is a vector representing all cities in order.
   // If the value is 0, the city was not visited
   // else, the city is visited at step i
@@ -232,7 +232,7 @@ int main(int argc, char* argv[]) {
 
   // Allocation of pheromons
   pheromons = (double*) malloc(nCities*nCities*sizeof(double));
-  pheromonsUpdate = (int*) malloc(nCities*nCities*sizeof(int));
+  pheromonsUpdate = (double*) malloc(nCities*nCities*sizeof(double));
   localPheromonsPath = (double*) malloc(nCities*sizeof(double));
 
   otherBestPath = (int*) malloc(nCities*sizeof(int));
@@ -292,7 +292,6 @@ int main(int argc, char* argv[]) {
         // select a random start city for an ant
         long rand = randomNumbers[random_counter];
         int currentCity = rand % nCities;
-        printf("%d\n", currentCity);
         random_counter = (random_counter + 1) % nRandomNumbers;
         // currentPath will contain the order of visited cities
         currentPath[currentCity] = 0;
@@ -301,7 +300,6 @@ int main(int argc, char* argv[]) {
           rand = randomNumbers[random_counter];
           random_counter = (random_counter + 1) % nRandomNumbers;
           currentCity = computeNextCity(currentCity, currentPath, map, nCities, pheromons, alpha, beta, rand);
-          printf("%d\n", currentCity);
 
           if (currentCity == -1) {
             printf("There is an error choosing the next city in iteration %ld for ant %d on node %d\n", loop_counter, ant_counter, prank);
@@ -342,7 +340,7 @@ int main(int argc, char* argv[]) {
     findPheromonsPath(localPheromonsPath, bestPath, pheromons, nCities);
 
     for (j = 0; j < nCities*nCities; j++) {
-      pheromonsUpdate[j] = 1;
+      pheromonsUpdate[j] = 1.0;
     }
     long tempBestCost = bestCost;
     int* tempBestPath = (int*) malloc(nCities * sizeof(int));
@@ -386,13 +384,13 @@ int main(int argc, char* argv[]) {
         }
 
         for (j = 0; j < nCities - 1; j++) {
-          pheromonsUpdate[getMatrixIndex(otherBestPath[j],otherBestPath[j+1],nCities)] += 1;
-          pheromonsUpdate[getMatrixIndex(otherBestPath[j+1],otherBestPath[j],nCities)] += 1;
+          pheromonsUpdate[getMatrixIndex(otherBestPath[j],otherBestPath[j+1],nCities)] += 1.0;
+          pheromonsUpdate[getMatrixIndex(otherBestPath[j+1],otherBestPath[j],nCities)] += 1.0;
           pheromons[getMatrixIndex(otherBestPath[j],otherBestPath[j+1],nCities)] += otherPheromonsPath[j];
           pheromons[getMatrixIndex(otherBestPath[j+1],otherBestPath[j],nCities)] += otherPheromonsPath[j];
         }
-        pheromonsUpdate[getMatrixIndex(otherBestPath[nCities-1],otherBestPath[0],nCities)] += 1;
-        pheromonsUpdate[getMatrixIndex(otherBestPath[0],otherBestPath[nCities-1],nCities)] += 1;
+        pheromonsUpdate[getMatrixIndex(otherBestPath[nCities-1],otherBestPath[0],nCities)] += 1.0;
+        pheromonsUpdate[getMatrixIndex(otherBestPath[0],otherBestPath[nCities-1],nCities)] += 1.0;
         pheromons[getMatrixIndex(otherBestPath[nCities-1],otherBestPath[0],nCities)] += otherPheromonsPath[nCities - 1];
         pheromons[getMatrixIndex(otherBestPath[0],otherBestPath[nCities-1],nCities)] += otherPheromonsPath[nCities - 1];
       }
