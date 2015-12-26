@@ -38,10 +38,10 @@ cd ..
 
 
 ## Parallel jobs
-for p in "parallel1" #"parallel2" "parallel3" "parallel4"
+for p in "parallel1" "parallel2" "parallel3" "parallel4"
 do
   cd $p
-  for i in 1 #2 4 8 16
+  for i in 1 2 4 8 16
   do
     FILE="mpi_$ROOT$i.run"
     if [ -e $FILE ]; then
