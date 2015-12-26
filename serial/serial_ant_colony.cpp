@@ -125,7 +125,9 @@ int main(int argc, char* argv[]) {
 
       // select a random start city for an ant
       long rand = randomNumbers[random_counter];
+      printf("random number : %ld\n", rand);
       int currentCity = rand % nCities;
+      printf("First current city : %d\n", currentCity);
       random_counter = (random_counter + 1) % nRandomNumbers;
       // currentPath will contain the order of visited cities
       currentPath[currentCity] = 0;
