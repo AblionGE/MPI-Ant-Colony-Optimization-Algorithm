@@ -1,6 +1,6 @@
 /**
  *
- * Ant Colony Traveling Salesman Problem Pptimization - MPI
+ * Ant Colony Traveling Salesman Problem Optimization - MPI
  * utils.h - help functions
  * Marc Schaer
  *

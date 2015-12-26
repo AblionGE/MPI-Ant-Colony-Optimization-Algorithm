@@ -28,10 +28,6 @@ cd parallel3
 make clean
 make
 cd ..
-cd parallel4
-make clean
-make
-cd ..
 cd serial
 make clean
 make

@@ -1,6 +1,6 @@
 /**
  *
- * Ant Colony Traveling Salesman Problem Pptimization - MPI
+ * Ant Colony Traveling Salesman Problem Optimization - MPI
  * Serial implementation
  * Marc Schaer
  *
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
   /*****************************/
 
   // External loop
-  while (loop_counter < iterations && terminationCondition < (long) ceilf(nAnts * iterations * terminationConditionPercentage)) {
+  while (loop_counter < iterations && terminationCondition < (long) ceilf(iterations * terminationConditionPercentage)) {
 
     // printf("Loop nr. : %d, terminationCondition : %ld,, bestCost : %ld\n", loop_counter, terminationCondition,bestCost);
 
@@ -193,8 +193,10 @@ int main(int argc, char* argv[]) {
   //printPath(bestPath, nCities);
   printf("best cost : %ld\n", bestCost);
 
+  /********** ENDTIMER **********/
   end = second();
   printf("Total time %f\n", (end-start));
+  /*****************************/
 
   // deallocate the pointers
   free(map);

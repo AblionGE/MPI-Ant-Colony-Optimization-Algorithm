@@ -4,7 +4,6 @@ MAX_NODES=0
 OUTPUT_PARALLEL1="comparison1.txt"
 OUTPUT_PARALLEL2="comparison2.txt"
 OUTPUT_PARALLEL3="comparison3.txt"
-OUTPUT_PARALLEL4="comparison4.txt"
 
 for random in $(ls . | grep random | grep .txt)
 do
@@ -103,37 +102,9 @@ do
   done
   cd ..
 
-  cd parallel4 
-  for results in $(ls | grep slurm)
-  do
-    temp=$(cat $results | grep $FILE)
-    if [ "$temp" != "" ]; then
-      N=$(head -n 1 $results | wc -w)
-      INDEX=$(head -n 1 $results | awk -v N=$N '{print $N}')
-      if [ "$SERIAL_P4[$INDEX]" -eq "" ]; then
-        SERIAL_P4[$INDEX]=0
-      fi
-      if [ "$P4_SERIAL[$INDEX]" -eq "" ]; then
-        P4_SERIAL[$INDEX]=0
-      fi
-      if [ $INDEX -gt $MAX_NODES ]; then
-        MAX_NODES=$INDEX
-      fi
-      N=$(head -n 6 $results | tail -n 1 | wc -w)
-      PARALLEL4COST[$INDEX]=$(head -n 6 $results | tail -n 1 | awk -v N=$N '{print $N}')
-      if [ "$PARALLEL4COST[$INDEX]" -gt "$SERIALCOST" ]; then
-        SERIAL_P4[$INDEX]=$(echo "$SERIAL_P4[$INDEX] + 1" | bc)
-      elif [ "$PARALLEL2COST[$INDEX]" -lt "$SERIALCOST" ]; then
-        P4_SERIAL[$INDEX]=$(echo "$P4_SERIAL[$INDEX] + 1" | bc)
-      fi
-    fi
-  done
-  cd ..
-
   echo "$SERIALCOST $PARALLEL1COST" >> $OUTPUT_PARALLEL1
   echo "$SERIALCOST $PARALLEL2COST" >> $OUTPUT_PARALLEL2
   echo "$SERIALCOST $PARALLEL3COST" >> $OUTPUT_PARALLEL3
-  echo "$SERIALCOST $PARALLEL4COST" >> $OUTPUT_PARALLEL4
 
 done
 
@@ -151,8 +122,3 @@ echo "" >> $OUTPUT_PARALLEL3
 echo "Summary" >> $OUTPUT_PARALLEL3
 echo "Serial beats Parallel : $SERIAL_P3" >> $OUTPUT_PARALLEL3
 echo "Parallel beats Serial : $P3_SERIAL" >> $OUTPUT_PARALLEL3
-
-echo "" >> $OUTPUT_PARALLEL4
-echo "Summary" >> $OUTPUT_PARALLEL4
-echo "Serial beats Parallel : $SERIAL_P4" >> $OUTPUT_PARALLEL4
-echo "Parallel beats Serial : $P4_SERIAL" >> $OUTPUT_PARALLEL4

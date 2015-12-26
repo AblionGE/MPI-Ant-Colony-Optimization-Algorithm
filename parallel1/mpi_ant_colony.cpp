@@ -1,4 +1,10 @@
-/* Ant Colony Optimixzation Algorithm - Marc Schaer*/
+/**
+ *
+ * Ant Colony Traveling Salesman Problem Optimization - MPI
+ * Parallel implementation - Share best path of each node
+ * Marc Schaer
+ *
+ **/
 #include <mpi.h>
 #include "utils.h"
 
@@ -21,26 +27,28 @@ int main(int argc, char* argv[]) {
     printf("NbOfNodes %d\n", psize);
   }
 
+  /**** VARIABLES DECLARATIONS ******/
   int i, j, ant_counter, cities_counter;
   long loop_counter;
-  long random_counter = 0;
   long external_loop_counter = 0;
-  int *map = NULL;
+  int* map = NULL;
   double *pheromons;
   double* pheromonsUpdate;
   // bestPath is a vector representing all cities in order.
   // If the value is 0, the city was not visited
   // else, the city is visited at step i
-  int *bestPath;
-  int *otherBestPath;
-  int *currentPath;
+  int* bestPath;
+  int* otherBestPath;
+  int* currentPath;
   long bestCost = INFTY;
   long otherBestCost;
   double* localPheromonsPath;
   double* otherPheromonsPath;
 
+  // To compare implementations, we need to have a fixed randomization.
   long* randomNumbers;
   long nRandomNumbers = 0;
+  long random_counter = 0;
 
   char* mapFile;
   char* randomFile;
@@ -51,12 +59,17 @@ int main(int argc, char* argv[]) {
   double beta; 
   double evaporationCoeff; 
   int nCities = 0;
-  int* nAntsPerNode;
+
+  // vector with number of ants per nodes
+  int* nAntsPerNode = (int*) malloc(psize*sizeof(int));
+
+  // termination condition
   long terminationCondition = 0;
+  // this variable is used to share its own current termiantion condition with others
   long otherTerminationCondition = 0;
   double terminationConditionPercentage = 0.4;
 
-  // share random file first
+  /*** LOAD AND SHARE RANDOM NUMBERS ***/
   if (prank == 0) {
     std::ifstream in;
     randomFile = argv[2];
@@ -73,9 +86,8 @@ int main(int argc, char* argv[]) {
       return -1;
     }
 
-    in >> out;
-
     // Define number of random numbers
+    in >> out;
     nRandomNumbers = atol(out);
 
     // Allocation of random numbers vector
@@ -96,6 +108,7 @@ int main(int argc, char* argv[]) {
 
   }
 
+  // Share number of random numbers
   if (MPI_Bcast(&nRandomNumbers, 1, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
     printf("Node %d : Error in Broadcast of nRandomNumbers", prank);
     MPI_Finalize();
@@ -103,26 +116,29 @@ int main(int argc, char* argv[]) {
   }
 
   if (prank != 0) {
+    // Allocation for random numbers on non-master nodes
     randomNumbers = (long*) malloc(nRandomNumbers*sizeof(long));
     for (i = 0; i < nRandomNumbers; i++) {
       randomNumbers[i] = 0;
     }
   }
 
+  // Share all random numbers
   if (MPI_Bcast(&randomNumbers[0], nRandomNumbers, MPI_LONG, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
     printf("Node %d : Error in Broadcast of randomNumbers", prank);
     MPI_Finalize();
     return -1;
   }
+  /*************************************/
 
-  // Start Timing
+  /******** START TIMER ********/
   if (prank == 0) {
     start = second();
   }
+  /*****************************/
 
-  nAntsPerNode = (int*) malloc(psize*sizeof(int));
 
-  // Root reads args
+  /*** READ ARGUMENTS AND DISTRIBUTE ANTS ***/
   if (prank == 0) {
     mapFile = argv[1];
     nAnts = atoi(argv[3]);
@@ -145,6 +161,7 @@ int main(int argc, char* argv[]) {
     printf("Iterations %ld\n", externalIterations*onNodeIteration);
     printf("Ants %d\n", nAnts);
 
+    /*** LOAD MAP ***/
     // Load the map and the number of cities
     std::ifstream in;
     in.open(mapFile);
@@ -174,11 +191,11 @@ int main(int argc, char* argv[]) {
       MPI_Finalize();
       return -1;
     }
-
-    // printf("Number of cities : %d\n", nCities);
+    /****************/
   }
+  /******************************************/
 
-  // And then it shares values with other nodes
+  /*** SHARE WITH OTHERS ***/
   if (MPI_Bcast(&nAntsPerNode[0], psize, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
     printf("Node %d : Error in Broadcast of nAntsPerNode", prank);
     MPI_Finalize();
@@ -230,7 +247,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  // Allocation of pheromons
+  /*** PHEROMONS AND PATHS ALLOCATION ***/
   pheromons = (double*) malloc(nCities*nCities*sizeof(double));
   pheromonsUpdate = (double*) malloc(nCities*nCities*sizeof(double));
   localPheromonsPath = (double*) malloc(nCities*sizeof(double));
@@ -252,13 +269,16 @@ int main(int argc, char* argv[]) {
   for (i = 0; i < nCities * nCities; i++) {
     pheromons[i] = 0.1;
   }
+  /**************************************/
 
   nAnts = nAntsPerNode[prank];
+  // Compute total of ants between all nodes
   int totalNAnts = 0;
   for (i = 0; i < psize; i++) {
     totalNAnts += nAntsPerNode[i];
   }
 
+  // Compute number of ants in nodes before me (prank smaller than mine)
   int nAntsBeforeMe = 0;
   for (i = 0; i < psize; i++) {
     if (i < prank) {
@@ -268,16 +288,17 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  // Set the random counter to have right random values in each nodes
   random_counter = (random_counter + (onNodeIteration * nAntsBeforeMe * nCities)) % nRandomNumbers;
 
   long antsBestCost = INFTY;
 
-  while (external_loop_counter < externalIterations && terminationCondition < (long) ceilf(totalNAnts * externalIterations * onNodeIteration * terminationConditionPercentage)) {
+  while (external_loop_counter < externalIterations && terminationCondition < (long) ceilf(externalIterations * onNodeIteration * terminationConditionPercentage)) {
 
     loop_counter = 0;
     while (loop_counter < onNodeIteration) {
 
-      printf("Loop nr. : %ld in node %d, terminationCondition : %ld, bestCost : %ld\n", external_loop_counter, prank, terminationCondition,bestCost);
+      // printf("Loop nr. : %ld in node %d, terminationCondition : %ld, bestCost : %ld\n", external_loop_counter, prank, terminationCondition,bestCost);
 
       // Loop over each ant
       for (ant_counter = 0; ant_counter < nAnts; ant_counter++) {
@@ -289,9 +310,7 @@ int main(int argc, char* argv[]) {
 
         // select a random start city for an ant
         long rand = randomNumbers[random_counter];
-        printf("random number : %ld\n", rand);
         int currentCity = rand % nCities;
-        printf("First current city : %d\n", currentCity);
         random_counter = (random_counter + 1) % nRandomNumbers;
         // currentPath will contain the order of visited cities
         currentPath[currentCity] = 0;
@@ -313,7 +332,7 @@ int main(int argc, char* argv[]) {
 
         // update bestCost and bestPath
         long oldCost = bestCost;
-        bestCost = updateBestPath(bestCost, bestPath, currentPath, map, nCities);
+        bestCost = computeCost(bestCost, bestPath, currentPath, map, nCities);
 
         if (oldCost > bestCost) {
           copyVectorInt(currentPath, bestPath, nCities);
@@ -337,22 +356,31 @@ int main(int argc, char* argv[]) {
       loop_counter++;
     }
 
+    // Find the pheromons values from best path just computed locally
     findPheromonsPath(localPheromonsPath, bestPath, pheromons, nCities);
 
+    // Set number of time a values will be added to each pheromon edge
+    // It is used to do an average and to not have paths that become really important quickly.
     for (j = 0; j < nCities*nCities; j++) {
       pheromonsUpdate[j] = 1.0;
     }
+
+    // Define temporary values
     long tempBestCost = bestCost;
     int* tempBestPath = (int*) malloc(nCities * sizeof(int));
     long tempTerminationCondition = terminationCondition;
     copyVectorInt(bestPath, tempBestPath, nCities);
+
+    // Each node will send to each other its values
     for (i = 0; i < psize; i++) {
       if (prank == i) {
+        // Set "other" values with my values
         copyVectorInt(bestPath, otherBestPath, nCities);
         copyVectordouble(localPheromonsPath, otherPheromonsPath, nCities);
         otherTerminationCondition = terminationCondition;
         otherBestCost = bestCost;
       }
+      // Share values from node i
       if (MPI_Bcast(&otherBestPath[0], nCities, MPI_INT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
         printf("Node %d : Error in Broadcast of otherBestPath", prank);
         MPI_Finalize();
@@ -374,15 +402,18 @@ int main(int argc, char* argv[]) {
         return -1;
       }
 
+      // If i am not node i, I will check if values from node i are better than mine
       if (prank != i) {
         if (otherBestCost < tempBestCost) {
           tempTerminationCondition = otherTerminationCondition;
           tempBestCost = otherBestCost;
           copyVectorInt(otherBestPath, tempBestPath,  nCities);
         } else if (otherBestCost == tempBestCost) {
+          // If the best cost is the same as mine, I simply update the termination condition counter
           tempTerminationCondition += otherTerminationCondition;
         }
 
+        // Update pheromons received from other node
         for (j = 0; j < nCities - 1; j++) {
           pheromonsUpdate[getMatrixIndex(otherBestPath[j],otherBestPath[j+1],nCities)] += 1.0;
           pheromonsUpdate[getMatrixIndex(otherBestPath[j+1],otherBestPath[j],nCities)] += 1.0;
@@ -396,10 +427,12 @@ int main(int argc, char* argv[]) {
       }
     }
 
+    // Compute the average for each pheromons value received
     for (j = 0; j < nCities*nCities; j++) {
       pheromons[j] = pheromons[j] / pheromonsUpdate[j];
     }
 
+    // Set own variables with new best values
     bestCost = tempBestCost;
     copyVectorInt(tempBestPath, bestPath, nCities);
     terminationCondition = tempTerminationCondition;
@@ -407,6 +440,7 @@ int main(int argc, char* argv[]) {
 
     external_loop_counter++;
 
+    // Set the counter correctly for next random numbers on current node
     random_counter = (random_counter + (onNodeIteration * (totalNAnts - nAnts) * nCities)) % nRandomNumbers;
   }
 
@@ -419,7 +453,7 @@ int main(int argc, char* argv[]) {
         return -1;
       }
       long oldCost = bestCost;
-      bestCost = updateBestPath(bestCost, bestPath, otherBestPath, map, nCities);
+      bestCost = computeCost(bestCost, bestPath, otherBestPath, map, nCities);
 
       if (oldCost > bestCost) {
         copyVectorInt(otherBestPath, bestPath, nCities);
@@ -435,13 +469,16 @@ int main(int argc, char* argv[]) {
 
 
   if (prank == 0) {
-    // printPath(bestPath, nCities);
-    printf("best cost : %ld\n", bestCost);
   }
 
   if (prank == 0) {
+    // printPath(bestPath, nCities);
+    printf("best cost : %ld\n", bestCost);
+
+    /*** END TIMER ***/
     end = second();
     printf("TotalTime %f\n", (end - start));
+    /*****************/
   }
 
   // deallocate the pointers
