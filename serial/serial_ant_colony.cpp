@@ -1,3 +1,11 @@
+/**
+ *
+ * Ant Colony Traveling Salesman Problem Pptimization - MPI
+ * Serial implementation
+ * Marc Schaer
+ *
+ **/
+
 #include "utils.h"
 
 int main(int argc, char* argv[]) {
@@ -10,7 +18,6 @@ int main(int argc, char* argv[]) {
   printf("NbOfAgents 0\n");
 
   int i, j, loop_counter, ant_counter, cities_counter;
-  long random_counter = 0;
   int *map = NULL;
   double *pheromons;
   // bestPath is a vector representing all cities in order.
@@ -19,7 +26,11 @@ int main(int argc, char* argv[]) {
   int *bestPath;
   int *currentPath;
   long bestCost = INFTY;
+
+  // To compare implementations, we need to have a fixed randomization.
+  long nRandomNumbers = 0;
   long* randomNumbers;
+  long random_counter = 0;
 
   char* mapFile = argv[1];
   char* randomFile = argv[2];
@@ -29,7 +40,6 @@ int main(int argc, char* argv[]) {
   double beta = atof(argv[6]);
   double evaporationCoeff = atof(argv[7]);
   int nCities = 0;
-  long nRandomNumbers = 0;
   long terminationCondition = 0;
   double terminationConditionPercentage = 0.4;
 
@@ -37,8 +47,11 @@ int main(int argc, char* argv[]) {
   printf("Iterations %ld\n", iterations);
   printf("Ants %d\n", nAnts);
 
+  /******** START TIMER ********/
   start = second();
+  /*****************************/
 
+  /********* LOAD MAP *********/
   // Load the map and the number of cities
   std::ifstream in;
   in.open(mapFile);
@@ -61,6 +74,15 @@ int main(int argc, char* argv[]) {
 
   in.close();
 
+  // Load the map inside map variable
+  if (LoadCities(mapFile, map)) {
+    printf("The filepath %s is incorrect\n", mapFile);
+    return -1;
+  }
+
+  /*****************************/
+
+  /**** LOAD RANDOM NUMBERS ****/
   // Read random number file
   in.open(randomFile);
 
@@ -85,16 +107,11 @@ int main(int argc, char* argv[]) {
     i++;
   }
 
-  // Load the map inside map variable
-  if (LoadCities(mapFile, map)) {
-    printf("The filepath %s is incorrect\n", mapFile);
-    return -1;
-  }
+  /*****************************/
 
+  /*** VARIABLES ALLOCATION ***/
 
-  // Allocation of pheromons
   pheromons = (double*) malloc(nCities*nCities*sizeof(double));
-
   bestPath = (int*) malloc(nCities*sizeof(int));
   currentPath = (int*) malloc(nCities*sizeof(int));
 
@@ -110,10 +127,12 @@ int main(int argc, char* argv[]) {
   loop_counter = 0;
   long antsBestCost = INFTY;
 
+  /*****************************/
+
   // External loop
   while (loop_counter < iterations && terminationCondition < (long) ceilf(nAnts * iterations * terminationConditionPercentage)) {
 
-    printf("Loop nr. : %d, terminationCondition : %ld,, bestCost : %ld\n", loop_counter, terminationCondition,bestCost);
+    // printf("Loop nr. : %d, terminationCondition : %ld,, bestCost : %ld\n", loop_counter, terminationCondition,bestCost);
 
     // Loop over each ant
     for (ant_counter = 0; ant_counter < nAnts; ant_counter++) {
@@ -125,9 +144,7 @@ int main(int argc, char* argv[]) {
 
       // select a random start city for an ant
       long rand = randomNumbers[random_counter];
-      printf("random number : %ld\n", rand);
       int currentCity = rand % nCities;
-      printf("First current city : %d\n", currentCity);
       random_counter = (random_counter + 1) % nRandomNumbers;
       // currentPath will contain the order of visited cities
       currentPath[currentCity] = 0;
@@ -149,7 +166,7 @@ int main(int argc, char* argv[]) {
 
       // update bestCost and bestPath
       long oldCost = bestCost;
-      bestCost = updateBestPath(bestCost, bestPath, currentPath, map, nCities);
+      bestCost = computeCost(bestCost, bestPath, currentPath, map, nCities);
 
       if (oldCost > bestCost) {
         copyVectorInt(currentPath, bestPath, nCities);

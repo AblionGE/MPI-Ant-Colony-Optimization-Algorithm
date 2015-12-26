@@ -1,3 +1,11 @@
+/**
+ *
+ * Ant Colony Traveling Salesman Problem Pptimization - MPI
+ * utils.h - help functions
+ * Marc Schaer
+ *
+ **/
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,6 +66,10 @@ void copyVectordouble(double* in, double* out, int size) {
   }
 }
 
+/**
+ * returns the pheromons value of a given path
+ *
+ **/
 void findPheromonsPath (double* pheromonsPath, int* bestPath, double* pheromons, int nCities) {
   int i;
   int previousCity = 0;
@@ -71,6 +83,10 @@ void findPheromonsPath (double* pheromonsPath, int* bestPath, double* pheromons,
   pheromonsPath[nCities - 1] = pheromons[getMatrixIndex(nextCity, bestPath[0], nCities)];
 }
 
+/**
+ * Load map from a file given by generate_map.cpp code
+ * Returns 0 if everything is fine
+ **/
 int LoadCities(char* file, int* map) {
   std::ifstream in;
   int matrixFull = 1;
@@ -105,13 +121,14 @@ int LoadCities(char* file, int* map) {
     }
   }
 
-  // printMap(map, size);
-
   in.close();
 
   return 0;
 }
 
+/**
+ * Compute the probability to go in each city from current city
+ **/
 void computeProbabilities(int currentCity, double* probabilities, int* path, int* map, int nCities, double* pheromons, double alpha, double beta) {
   int i;
   double total = 0;
@@ -142,6 +159,9 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
   }
 }
 
+/**
+ * Given the current city, select the next city to go to (for an ant)
+ **/
 int computeNextCity(int currentCity, int* path, int* map, int nCities, double* pheromons, double alpha, double beta, long random) {
   int i = 0;
   double *probabilities;
@@ -162,7 +182,11 @@ int computeNextCity(int currentCity, int* path, int* map, int nCities, double* p
   return -1;
 }
 
-long updateBestPath(long bestCost, int* bestPath, int* currentPath, int* map, int nCities) {
+/**
+ * Compute the cost of the new path and returns the best cost between the current best and the one
+ * from the new path.
+ **/
+long computeCost(long bestCost, int* bestPath, int* currentPath, int* map, int nCities) {
   // compute currentCost
   int i;
   long currentCost = 0;
@@ -184,6 +208,11 @@ long updateBestPath(long bestCost, int* bestPath, int* currentPath, int* map, in
   }
 }
 
+/**
+ * Update the pheromons in the pheromons matrix given the current path
+ *
+ * The maximum pheromon value for an edge is 1.
+ **/
 void updatePheromons(double* pheromons, int* path, long cost, int nCities) {
   int i;
   int* orderedCities = (int*) malloc(nCities*sizeof(int));
