@@ -117,7 +117,7 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
   double total = 0;
   for (i = 0; i < nCities; i++) {
     if (path[i] != -1 || i == currentCity) {
-      probabilities[i] = 0;
+      probabilities[i] = 0.0;
     } else {
       double p = pow(1.0 / map[getMatrixIndex(currentCity,i,nCities)],alpha) * pow(pheromons[getMatrixIndex(currentCity,i,nCities)], beta);
       probabilities[i] = p;
@@ -131,7 +131,7 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
     i = 0;
     for (i = 0; i < nCities; i++) {
       if (path[i] == -1 && i != currentCity) {
-        probabilities[i] = 1;
+        probabilities[i] = 1.0;
         total++;
       }
     }

@@ -51,14 +51,14 @@ void copyVectorInt(int* in, int* out, int size) {
   }
 }
 
-void copyVectorFloat(float* in, float* out, int size) {
+void copyVectordouble(double* in, double* out, int size) {
   int k;
   for (k = 0; k < size; k++) {
-    out[k] = (float) in[k];
+    out[k] = (double) in[k];
   }
 }
 
-void findPheromonsPath (float* pheromonsPath, int* bestPath, float* pheromons, int nCities) {
+void findPheromonsPath (double* pheromonsPath, int* bestPath, double* pheromons, int nCities) {
   int i;
   int previousCity = 0;
   int nextCity = 0;
@@ -112,12 +112,12 @@ int LoadCities(char* file, int* map) {
   return 0;
 }
 
-void computeProbabilities(int currentCity, double* probabilities, int* path, int* map, int nCities, float* pheromons, float alpha, float beta) {
+void computeProbabilities(int currentCity, double* probabilities, int* path, int* map, int nCities, double* pheromons, double alpha, double beta) {
   int i;
   double total = 0;
   for (i = 0; i < nCities; i++) {
     if (path[i] != -1 || i == currentCity) {
-      probabilities[i] = 0;
+      probabilities[i] = 0.0;
     } else {
       double p = pow(1.0 / map[getMatrixIndex(currentCity,i,nCities)],alpha) * pow(pheromons[getMatrixIndex(currentCity,i,nCities)], beta);
       probabilities[i] = p;
@@ -131,7 +131,7 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
     i = 0;
     for (i = 0; i < nCities; i++) {
       if (path[i] == -1 && i != currentCity) {
-        probabilities[i] = 1;
+        probabilities[i] = 1.0;
         total++;
       }
     }
@@ -142,7 +142,7 @@ void computeProbabilities(int currentCity, double* probabilities, int* path, int
   }
 }
 
-int computeNextCity(int currentCity, int* path, int* map, int nCities, float* pheromons, float alpha, float beta, long random) {
+int computeNextCity(int currentCity, int* path, int* map, int nCities, double* pheromons, double alpha, double beta, long random) {
   int i = 0;
   double *probabilities;
   probabilities = (double*) malloc(nCities*sizeof(double));
@@ -158,7 +158,6 @@ int computeNextCity(int currentCity, int* path, int* map, int nCities, float* ph
       return i;
     }
   }
-  printf("SHIT\n");
   free(probabilities);
   return -1;
 }
@@ -185,7 +184,7 @@ long updateBestPath(long bestCost, int* bestPath, int* currentPath, int* map, in
   }
 }
 
-void updatePheromons(float* pheromons, int* path, long cost, int nCities) {
+void updatePheromons(double* pheromons, int* path, long cost, int nCities) {
   int i;
   int* orderedCities = (int*) malloc(nCities*sizeof(int));
 
