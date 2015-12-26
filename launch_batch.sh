@@ -15,7 +15,7 @@ external=$7
 
 # Compile codes
 
-module load intel intelmpi
+module load mvapich2/2.0.1/gcc-4.4.7
 cd parallel1
 make clean
 make

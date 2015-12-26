@@ -272,8 +272,6 @@ int main(int argc, char* argv[]) {
 
   long antsBestCost = INFTY;
 
-  printf("%ld\n",(long) ceilf(totalNAnts * externalIterations * onNodeIteration * terminationConditionPercentage)); 
-
   while (external_loop_counter < externalIterations && terminationCondition < (long) ceilf(totalNAnts * externalIterations * onNodeIteration * terminationConditionPercentage)) {
 
     loop_counter = 0;
@@ -330,8 +328,8 @@ int main(int argc, char* argv[]) {
       }
 
       // Pheromon evaporation
-      for (i = 0; i < nCities * nCities; i++) {
-        pheromons[i] *= evaporationCoeff;
+      for (j = 0; j < nCities * nCities; j++) {
+        pheromons[j] *= evaporationCoeff;
       }
       // Update pheromons
       updatePheromons(pheromons, bestPath, bestCost, nCities);

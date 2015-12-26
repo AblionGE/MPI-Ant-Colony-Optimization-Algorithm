@@ -1,4 +1,4 @@
-MPICC		= mpiicpc
+MPICC		= mpic++
 CFLAGS_MPI	= -O3 -Wall -c -Wunused-variable
 
 LDFLAGS		= -lm
