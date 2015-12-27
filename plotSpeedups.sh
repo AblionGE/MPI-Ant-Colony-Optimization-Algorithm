@@ -36,7 +36,7 @@ do
 
   # RELATIVE SPEEDUP
   # Get parallel times and draw speedup graphs
-  for p in "parallel1" "parallel2" "parallel3" "parallel4";
+  for p in "parallel1" "parallel2" "parallel3"; 
   do
     cd $p
 
