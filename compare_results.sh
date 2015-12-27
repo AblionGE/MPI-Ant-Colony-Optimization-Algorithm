@@ -108,19 +108,19 @@ do
 
 done
 
-echo $OUTPUT_PARALLEL1
+echo "$OUTPUT_PARALLEL1" >> $OUTPUT_PARALLEL1
 echo "Summary" >> $OUTPUT_PARALLEL1
 echo "Serial beats Parallel : $SERIAL_P1" >> $OUTPUT_PARALLEL1
 echo "Parallel beats Serial : $P1_SERIAL" >> $OUTPUT_PARALLEL1
 echo "" >> $OUTPUT_PARALLEL1
 
-echo $OUTPUT_PARALLEL2
+echo "$OUTPUT_PARALLEL2" >> $OUTPUT_PARALLEL2
 echo "Summary" >> $OUTPUT_PARALLEL2
 echo "Serial beats Parallel : $SERIAL_P2" >> $OUTPUT_PARALLEL2
 echo "Parallel beats Serial : $P2_SERIAL" >> $OUTPUT_PARALLEL2
 echo "" >> $OUTPUT_PARALLEL2
 
-echo $OUTPUT_PARALLEL3
+echo "$OUTPUT_PARALLEL3" >> $OUTPUT_PARALLEL3
 echo "Summary" >> $OUTPUT_PARALLEL3
 echo "Serial beats Parallel : $SERIAL_P3" >> $OUTPUT_PARALLEL3
 echo "Parallel beats Serial : $P3_SERIAL" >> $OUTPUT_PARALLEL3
