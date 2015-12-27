@@ -378,6 +378,7 @@ int main(int argc, char* argv[]) {
         // Set "other" values with my values
         copyVectorInt(bestPath, otherBestPath, nCities);
         copyVectordouble(localPheromonsPath, otherPheromonsPath, nCities);
+        copyVectordouble(localPheromonsPath, tempPheromonsPath, nCities);
         otherTerminationCondition = terminationCondition;
         otherBestCost = bestCost;
       }
