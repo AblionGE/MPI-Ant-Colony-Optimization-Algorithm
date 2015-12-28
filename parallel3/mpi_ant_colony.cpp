@@ -52,6 +52,7 @@ int main(int argc, char* argv[]) {
   char* mapFile;
   char* randomFile;
   int nAnts; 
+  int totalNAnts;
   long externalIterations; 
   long onNodeIteration; 
   double alpha; 
@@ -140,25 +141,15 @@ int main(int argc, char* argv[]) {
   /*** READ ARGUMENTS AND DISTRIBUTE ANTS ***/
   if (prank == 0) {
     mapFile = argv[1];
-    nAnts = atoi(argv[3]);
+    totalNAnts = atoi(argv[3]);
     externalIterations = atoi(argv[4]);
     onNodeIteration = atoi(argv[5]);
     alpha = atof(argv[6]);
     beta = atof(argv[7]);
     evaporationCoeff = atof(argv[8]);
 
-    int antsPerNode = nAnts / psize;
-    int restAnts = nAnts - antsPerNode * psize;
-
-    for (i = 0; i < psize; i++) {
-      nAntsPerNode[i] = antsPerNode;
-      if (restAnts > i) {
-        nAntsPerNode[i]++;
-      }
-    }
-
     printf("Iterations %ld\n", externalIterations*onNodeIteration);
-    printf("Ants %d\n", nAnts);
+    printf("Ants %d\n", totalNAnts);
 
     /*** LOAD MAP ***/
     // Load the map and the number of cities
@@ -195,7 +186,7 @@ int main(int argc, char* argv[]) {
   /******************************************/
 
   /*** SHARE WITH OTHERS ***/
-  if (MPI_Bcast(&nAntsPerNode[0], psize, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+  if (MPI_Bcast(&totalNAnts, 1, MPI_INT, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
     printf("Node %d : Error in Broadcast of nAntsPerNode", prank);
     MPI_Finalize();
     return -1;
@@ -269,12 +260,17 @@ int main(int argc, char* argv[]) {
   }
   /**************************************/
 
-  nAnts = nAntsPerNode[prank];
-  // Compute total of ants between all nodes
-  int totalNAnts = 0;
+  int antsPerNode = totalNAnts / psize;
+  int restAnts = totalNAnts - antsPerNode * psize;
+
   for (i = 0; i < psize; i++) {
-    totalNAnts += nAntsPerNode[i];
+    nAntsPerNode[i] = antsPerNode;
+    if (restAnts > i) {
+      nAntsPerNode[i]++;
+    }
   }
+
+  nAnts = nAntsPerNode[prank];
 
   // Compute number of ants in nodes before me (prank smaller than mine)
   int nAntsBeforeMe = 0;
