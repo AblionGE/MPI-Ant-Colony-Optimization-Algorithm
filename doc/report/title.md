@@ -23,7 +23,7 @@ header-includes:
 % Title
 \HRule \\[0.4cm]
 { \huge \bfseries \textit{Program Parellelization of PC Clusters project}: \\[0.8cm] }
-{ \Huge \bfseries Ant Colony traveling salesman problem optimization\\[1.0cm] }
+{ \Huge \bfseries Ant Colony Traveling Salesman Problem Optimization\\[1.0cm] }
 { \huge \bfseries with MPI\\[0.8cm] }
 
 \HRule \\[2cm]

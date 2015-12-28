@@ -58,6 +58,8 @@ There are several problems that can happen with this algorithm :
 
 ### Edge selection
 
+\label{formula}
+
 An ant will select a path according to some probabilities that includes edge's length and pheromon values :
 
 \begin{figure}[!h]
@@ -125,3 +127,5 @@ Each ant will simply be represented by finding a path on the map from different 
 To find a path, the solution is to select a path from the current city (select an element in a column) being careful to not select an already visited city and selecting a city following the formula in section \ref{proba}.
 
 We can note that the pheromon values need to be stored in a matrix, too. This matrix will have the same construction as the one in figure \ref{matrix}.
+
+\newpage{}

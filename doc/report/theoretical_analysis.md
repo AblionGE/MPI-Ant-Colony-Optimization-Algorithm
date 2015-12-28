@@ -400,4 +400,6 @@ To have good performances, we need to have $t_p$ as small as possible. Ideally, 
 
 #### Remarks
 
-We can note that, in this analysis, we always compare thserial and the parallel implementation when they have exactly the same number of iterations. It allows us to have acceptable results. Nevertheless, we will see in next section that we can have another termination condition which is a certain cost for a path that stays the same for a certain number of iterations (we assume that the result cannot be better in this case). We will observe that some techniques we use to parallelize are not very good in term of result's optimality (even if it as a really good speedup).
+We can note that, in this analysis, we always compare the serial and the parallel implementation when they have exactly the same number of iterations. It allows us to have acceptable results. Nevertheless, we will see in next section that we can have another termination condition which is a certain cost for a path that stays the same for a certain number of iterations (we assume that the result cannot be better in this case). We will observe that some techniques we use to parallelize are not very good in term of result's optimality (even if it as a really good speedup).
+
+\newpage{}
