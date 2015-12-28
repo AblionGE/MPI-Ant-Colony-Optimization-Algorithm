@@ -291,7 +291,7 @@ int main(int argc, char* argv[]) {
 
   long antsBestCost = INFTY;
 
-  while (external_loop_counter < externalIterations) { //&& terminationCondition < (long) ceilf(externalIterations * onNodeIteration * terminationConditionPercentage)) {
+  while (external_loop_counter < externalIterations && terminationCondition < (long) ceilf(externalIterations * onNodeIteration * terminationConditionPercentage)) {
 
     loop_counter = 0;
     while (loop_counter < onNodeIteration) {
