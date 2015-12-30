@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
   long terminationCondition = 0;
   // this variable is used to share its own current termiantion condition with others
   long otherTerminationCondition = 0;
-  double terminationConditionPercentage = 0.4;
+  double terminationConditionPercentage = 0.7;
 
   /*** LOAD AND SHARE RANDOM NUMBERS ***/
   if (prank == 0) {

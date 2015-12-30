@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
   double evaporationCoeff = atof(argv[7]);
   int nCities = 0;
   long terminationCondition = 0;
-  double terminationConditionPercentage = 0.4;
+  double terminationConditionPercentage = 0.7;
 
   printf("RandomFile %s\n", randomFile);
   printf("Iterations %ld\n", iterations);
