@@ -369,6 +369,7 @@ int main(int argc, char* argv[]) {
         copyVectorInt(bestPath, otherBestPath, nCities);
         otherTerminationCondition = terminationCondition;
         otherBestCost = bestCost;
+        copyVectorDouble(pheromons, otherPheromons, nCities * nCities);
       }
       // Share values from node i
       if (MPI_Bcast(&otherBestPath[0], nCities, MPI_INT, i, MPI_COMM_WORLD) != MPI_SUCCESS) {
