@@ -308,25 +308,335 @@ In all cases, I did 5 executions with 5 different sets of random numbers. The fi
 
 All executions were made with 500 cities, 30'000 iterations, $\alpha$ and $\beta$ equal to 1, 0.9 for evaporation coefficient and 32 ants\footnote{In the \textit{result} folder, you can find executions with less iterations or less ants. Indeed, I observed that if the number of iterations is not big enough compared to the problem size, the serial implementation has not enough time to converge compared to the parallel implementation using many nodes.}.
 
-#### One local iteration without termination condition
 
-#### Hundred local iterations without termination condition
+\textbf{One local iteration without termination condition} (figures \ref{onewithout1} and \ref{summary_onewithout1})
 
-#### One local iteration with termination condition
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 206048 & 206048 & 138189 & 111941 & 133976 & 158574\\
+    \hline
+    \bf rand2 & 170317 & 170317 & 155951 & 122354 & 121297 & 142920\\
+    \hline
+    \bf rand3 & 162412 & 162412 & 142151 & 126308 & 128463 & 152194\\
+    \hline
+    \bf rand4 & 174843 & 174843 & 129743 & 136157 & 118470 & 136531\\
+    \hline
+    \bf rand5 & 179263 & 179263 & 138748 & 121309 & 116606 & 123602\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{onewithout1}
+\end{figure}
 
-#### Hundred local iterations with termination condition
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 0 & 0 & 0 & 0\\
+    \hline
+    \bf Parallel beats Serial & 0 & 5 & 5 & 5 & 5\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{onewithout1})}
+  \label{summary_onewithout1}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{Hundred local iterations without termination condition} (figures \ref{hundredwithout1} and \ref{summary_hundredwithout1})
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 175888 & 175888 & 189019 & 205045 & 220125 & 224030\\
+    \hline
+    \bf rand2 & 181575 & 181575 & 186233 & 238031 & 197331 & 232079\\
+    \hline
+    \bf rand3 & 187249 & 187249 & 217756 & 240954 & 210066 & 234327\\
+    \hline
+    \bf rand4 & 174060 & 174060 & 212855 & 217611 & 215536 & 232093\\
+    \hline
+    \bf rand5 & 170319 & 170319 & 184519 & 230064 & 230072 & 286673\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{hundredwithout1}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{hundredwithout1})}
+  \label{summary_hundredwithout1}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{One local iteration with termination condition} (figures \ref{onewith1} and \ref{summary_onewith1})
+
+I also tested to use another termination condition that is to have the same best cost after a certain number of iterations.
+For the results presented here (and below), the termination condition was of 70% of the total number of loops.
+We can observe that with this termination condition. the parallel algorithm converges really quickly, but the result is clearly bad and worst than the one from the serial implementation.
+Thus, I gave up this improvement.
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 169560 & 169560 & 1730115 & 1730115 & 1730115 & 1730115\\
+    \hline
+    \bf rand2 & 172790 & 172790 & 1780674 & 1780674 & 1780674 & 1780674\\
+    \hline
+    \bf rand3 & 177731 & 177731 & 1779516 & 1779516 & 1779516 & 1779516\\
+    \hline
+    \bf rand4 & 193771 & 193771 & 1789632 & 1798642 & 1798642 & 1798642\\
+    \hline
+    \bf rand5 & 185177 & 185177 & 1772935 & 1765619 & 1772935 & 1772935\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{onewith1}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{onewith1})}
+  \label{summary_onewith1}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{Hundred local iterations with termination condition} (figures \ref{hundredwith1} and \ref{summary_hundredwith1})
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 180300 & 180300 & 1685680  & 1578882    & 1577008        & 1661177\\
+    \hline
+    \bf rand2 & 166614 & 166614 & 1581740  & 1612139    & 1679066        & 1680811\\
+    \hline
+    \bf rand3 & 173203 & 173203 & 1576155  & 1680125    & 1740822        & 1679923\\
+    \hline
+    \bf rand4 & 173117 & 173117 & 1688282  & 1672961    & 1566590        & 1656622\\
+    \hline
+    \bf rand5 & 172340 & 172340 & 1628961  & 1713106    & 1713106        & 1693083\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{hundredwith1}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{hundredwith1})}
+  \label{summary_hundredwith1}
+\end{figure}
+
+\FloatBarrier
 
 ### Second parallel implementation
 
 For the second implementation, I tried to share only the best path between all nodes at each external iteration. To do that, each node has still to share its best values but it keeps only the best received one (or its own if it has the best result). In term of code, the only impact is that the update of pheromons from others is done after the ```for``` loop and not in the loop (loop presented in subsection \ref{parallel1}).
 
-#### One local iteration without termination condition
+\textbf{One local iteration without termination condition} (figures \ref{onewithout2} and \ref{summary_onewithout2})
 
-#### Hundred local iterations without termination condition
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 206048 & 206048 & 137135 & 133420 & 109250 & 135306\\
+    \hline
+    \bf rand2 & 170317 & 170317 & 159457 & 128820 & 122768 & 160282\\
+    \hline
+    \bf rand3 & 162412 & 162412 & 146277 & 175978 & 118603 & 149297\\
+    \hline
+    \bf rand4 & 174843 & 174843 & 146865 & 145787 & 140152 & 124771\\
+    \hline
+    \bf rand5 & 179263 & 179263 & 168949 & 147701 & 128391 & 140151\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{onewithout2}
+\end{figure}
 
-#### One local iteration with termination condition
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 0 & 1 & 0 & 0\\
+    \hline
+    \bf Parallel beats Serial & 0 & 5 & 4 & 5 & 5\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{onewithout2})}
+  \label{summary_onewithout2}
+\end{figure}
 
-#### Hundred local iterations with termination condition
+\FloatBarrier
+
+\textbf{Hundred local iterations without termination condition} (figures \ref{hundredwithout2} and \ref{summary_hundredwithout2})
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 175888 & 175888 & 189019 & 205045 & 220125 & 224030\\
+    \hline
+    \bf rand2 & 181575 & 181575 & 186233 & 238031 & 197331 & 232079\\
+    \hline
+    \bf rand3 & 187249 & 187249 & 217756 & 240954 & 210066 & 234327\\
+    \hline
+    \bf rand4 & 174060 & 174060 & 212855 & 217611 & 215536 & 232093\\
+    \hline
+    \bf rand5 & 170319 & 170319 & 184519 & 230064 & 230072 & 286673\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{hundredwithout2}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{hundredwithout2})}
+  \label{summary_hundredwithout2}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{One local iteration with termination condition} (figures \ref{onewith2} and \ref{summary_onewith2})
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 169560 & 169560 & 1730115 & 1730115 & 1730115 & 1730115\\
+    \hline
+    \bf rand2 & 172790 & 172790 & 1780674 & 1780674 & 1780674 & 1780674\\
+    \hline
+    \bf rand3 & 177731 & 177731 & 1779516 & 1779516 & 1779516 & 1779516\\
+    \hline
+    \bf rand4 & 193771 & 193771 & 1789632 & 1798642 & 1798642 & 1798642\\
+    \hline
+    \bf rand5 & 185177 & 185177 & 1772935 & 1765619 & 1772935 & 1772935\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{onewith2}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{onewith2})}
+  \label{summary_onewith2}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{Hundred local iterations with termination condition} (figures \ref{hundredwith2} and \ref{summary_hundredwith2})
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 180300 & 180300 & 1685680 & 1578882 & 1577008 & 1661177\\
+    \hline
+    \bf rand2 & 166614 & 166614 & 1581740 & 1612139 & 1679066 & 1680811\\
+    \hline
+    \bf rand3 & 173203 & 173203 & 1576155 & 1680125 & 1740822 & 1679923\\
+    \hline
+    \bf rand4 & 173117 & 173117 & 1688282 & 1672961 & 1566590 & 1656622\\
+    \hline
+    \bf rand5 & 172340 & 172340 & 1628961 & 1713106 & 1713106 & 1693083\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{hundredwith2}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{hundredwith2})}
+  \label{summary_hundredwith2}
+\end{figure}
+
+\FloatBarrier
 
 ### Third parallel implementation
 
@@ -344,15 +654,165 @@ if (MPI_Bcast(&otherPheromons[0], nCities * nCities, MPI_DOUBLE, i, MPI_COMM_WOR
 
 Of course, there will be a lot of communication for nothing (the majority of the matrix will have low values close to 0.
 
-#### One local iteration without termination condition
+\textbf{One local iteration without termination condition} (figures \ref{onewithout3} and \ref{summary_onewithout3})
 
-#### Hundred local iterations without termination condition
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 206048 & 206048 & 226692 & 229382 & 272316 & 299090\\
+    \hline
+    \bf rand2 & 170317 & 170317 & 240895 & 202389 & 270666 & 281549\\
+    \hline
+    \bf rand3 & 162412 & 162412 & 180564 & 197930 & 297000 & 353603\\
+    \hline
+    \bf rand4 & 174843 & 174843 & 240735 & 227874 & 287405 & 338268\\
+    \hline
+    \bf rand5 & 179263 & 179263 & 203006 & 226798 & 205372 & 301789\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{onewithout3}
+\end{figure}
 
-#### One local iteration with termination condition
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{onewithout3})}
+  \label{summary_onewithout3}
+\end{figure}
 
-#### Hundred local iterations with termination condition
+\FloatBarrier
 
-### With an additional termination condition
+\textbf{Hundred local iterations without termination condition} (figures \ref{hundredwithout3} and \ref{summary_hundredwithout3})
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 175888 & 175888 & 157072 & 235568 & 224547 & 319924\\
+    \hline
+    \bf rand2 & 181575 & 181575 & 190208 & 235288 & 221798 & 293365\\
+    \hline
+    \bf rand3 & 187249 & 187249 & 162000 & 187241 & 204388 & 262212\\
+    \hline
+    \bf rand4 & 174060 & 174060 & 185468 & 229670 & 269884 & 415996\\
+    \hline
+    \bf rand5 & 170319 & 170319 & 176118 & 243859 & 220186 & 307723\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{hundredwithout3}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 3 & 4 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{hundredwithout3})}
+  \label{summary_hundredwithout3}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{One local iteration with termination condition} (figures \ref{onewith3} and \ref{summary_onewith3})
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 169560 & 169560 & 1730115 & 1730115 & 1730115 & 1730115\\
+    \hline
+    \bf rand2 & 172790 & 172790 & 1600713 & 1715129 & 1780674 & 1733414\\
+    \hline
+    \bf rand3 & 177731 & 177731 & 1699064 & 1708854 & 1722617 & 1720331\\
+    \hline
+    \bf rand4 & 193771 & 193771 & 1669645 & 1688394 & 1741155 & 1691904\\
+    \hline
+    \bf rand5 & 185177 & 185177 & 1618844 & 1686588 & 1765619 & 1690262\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{onewith3}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{onewith3})}
+  \label{summary_onewith3}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{Hundred local iterations with termination condition} (figures \ref{hundredwith3} and \ref{summary_hundredwith3})
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf rand1 & 180300 & 180300 & 1641854 & 1509437 & 1568793 & 1721353\\
+    \hline
+    \bf rand2 & 166614 & 166614 & 1632773 & 1559375 & 1598569 & 1737959\\
+    \hline
+    \bf rand3 & 173203 & 173203 & 1565889 & 1595390 & 1713859 & 1710915\\
+    \hline
+    \bf rand4 & 173117 & 173117 & 1689794 & 1712136 & 1641396 & 1770857\\
+    \hline
+    \bf rand5 & 172340 & 172340 & 1641177 & 1691355 & 1713106 & 1743854\\
+    \hline
+  \end{tabular}
+  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \label{hundredwith3}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+    \hline
+    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \hline
+    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \hline
+  \end{tabular}
+  \caption{Summary of measurement from previous figure (\ref{hundredwith3})}
+  \label{summary_hundredwith3}
+\end{figure}
+
+\FloatBarrier
 
 ## Speedups
 

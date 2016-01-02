@@ -4,6 +4,7 @@ header-includes:
   - \usepackage{graphicx}
   - \usepackage[english]{babel}
   - \usepackage{fancyvrb}
+  - \usepackage{placeins}
   - \pagestyle{fancy}
   - \lhead{M. Schär}
   - \chead{PPOPC}
