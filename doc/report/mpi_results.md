@@ -827,27 +827,77 @@ About the different parallel implementation, the only interesting thing is that 
 ## Speedups
 
 For the different speedups, we can note that for all tests I have made, the speedup always looks like the same. Thus, I will only present one relative and one absolute speedup for one execution of my program, knowing that the others are similar.
-We can note that I will not show here the speedups for execution with the additional termination condition because the result was clearly not optimal.
+We can note that I will not show here the speedups for execution with the additional termination condition because the result was clearly not optimal and also not the speedups for hundred iterations, for the same reason.
 Nevertheless, they can be found directly in the ```results``` directory.
+
+The following speedups are the ones from file *rand1* from figure \ref{onewithout1}.
 
 ### Relative Speedup
 
-#### First parallel implementation
-TODO : print 4 matrices in a matrix manner
+#### First parallel implementation (figure \ref{relative1})
 
-#### Second parallel implementation
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.8]{img/RelativeSpeeduprandom1_1.pdf}
+  \caption{Relative speedup for random file 1 from results in figure \ref{onewithout1}}
+  \label{relative1}
+\end{figure}
 
-#### Third parallel implementation
+\FloatBarrier
+
+#### Second parallel implementation (figure \ref{relative2})
+
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.8]{img/RelativeSpeeduprandom1_2.pdf}
+  \caption{Relative speedup for random file 1 from results in figure \ref{onewithout1}}
+  \label{relative2}
+\end{figure}
+
+\FloatBarrier
+
+#### Third parallel implementation (figure \ref{relative3})
+
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.8]{img/RelativeSpeeduprandom1_3.pdf}
+  \caption{Relative speedup for random file 1 from results in figure \ref{onewithout1}}
+  \label{relative3}
+\end{figure}
+
+\FloatBarrier
 
 ### Absolute Speedup
 
-#### First parallel implementation
-TODO : print 4 matrices in a matrix manner
+#### First parallel implementation (figure \ref{absolute1})
 
-#### Second parallel implementation
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.8]{img/AbsoluteSpeeduprandom1_1.pdf}
+  \caption{Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
+  \label{absolute1}
+\end{figure}
 
-#### Third parallel implementation
+\FloatBarrier
+
+#### Second parallel implementation (figure \ref{absolute2})
+
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.8]{img/AbsoluteSpeeduprandom1_2.pdf}
+  \caption{Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
+  \label{absolute2}
+\end{figure}
+
+\FloatBarrier
+
+#### Third parallel implementation (figure \ref{absolute3})
+
+\begin{figure}[!h]
+  \centering \includegraphics[scale=0.8]{img/AbsoluteSpeeduprandom1_3.pdf}
+  \caption{Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
+  \label{absolute3}
+\end{figure}
+
+\FloatBarrier
 
 ### Comparison with Theoretical Speedup
+
+### Comments
 
 \newpage{}
