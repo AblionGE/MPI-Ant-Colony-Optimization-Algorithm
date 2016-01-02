@@ -814,9 +814,21 @@ Of course, there will be a lot of communication for nothing (the majority of the
 
 \FloatBarrier
 
+### Comments
+
+Watching these results, we first observe that the additional termination condition is clearly not a good idea. Indeed, in all executions with this condition, the parallel implementation converges too quickly and stays stuck in a bad solution.
+
+The other improvement (local iterations) is also not a good idea. Indeed, we can observe that the results are in general not so far from the serial execution but they are generally beaten by it.
+
+Finally, the execution with one local iteration seems to be the good solution to solve this problem. Indeed, we can conclude that sharing informations after each iterations makes the parallel algorithm good in term of optimality, but of course, it increases communications and the parallelization is not as good as expected initially.
+
+About the different parallel implementation, the only interesting thing is that the third implementation (sharing whole pheromon matrix) is not as good as first and second implementation. Indeed, sharing too much informations is probably not really efficient because it can give more importance to uninteresting path whereas first and second implementations give more importance to best paths what can lead quickly to a good solution (which is here always better than the serial solution).
+
 ## Speedups
 
 For the different speedups, we can note that for all tests I have made, the speedup always looks like the same. Thus, I will only present one relative and one absolute speedup for one execution of my program, knowing that the others are similar.
+We can note that I will not show here the speedups for execution with the additional termination condition because the result was clearly not optimal.
+Nevertheless, they can be found directly in the ```results``` directory.
 
 ### Relative Speedup
 
