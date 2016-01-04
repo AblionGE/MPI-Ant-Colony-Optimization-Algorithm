@@ -415,6 +415,9 @@ int main(int argc, char* argv[]) {
     // Compute the average for each pheromons value received
     for (j = 0; j < nCities*nCities; j++) {
       pheromons[j] = pheromons[j] / pheromonsUpdate[j];
+      if (pheromons[j] > 1.0) {
+        pheromons[j] = 1.0;
+      }
     }
 
     // Set own variables with new best values
