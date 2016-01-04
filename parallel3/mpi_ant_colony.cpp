@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
   long bestCost = INFTY;
   long otherBestCost;
   double* otherPheromons;
+  double* tempPheromons;
 
   // To compare implementations, we need to have a fixed randomization.
   long* randomNumbers;
@@ -243,6 +244,7 @@ int main(int argc, char* argv[]) {
 
   otherBestPath = (int*) malloc(nCities*sizeof(int));
   otherPheromons = (double*) malloc(nCities*nCities*sizeof(double));
+  tempPheromons = (double*) malloc(nCities*nCities*sizeof(double));
   for (i = 0; i < nCities; i++) {
     otherBestPath[i] = -1;
   }
@@ -354,6 +356,7 @@ int main(int argc, char* argv[]) {
     // It is used to do an average and to not have paths that become really important quickly.
     for (j = 0; j < nCities*nCities; j++) {
       pheromonsUpdate[j] = 1.0;
+      tempPheromons[j] = 0.0;
     }
 
     // Define temporary values
@@ -407,17 +410,15 @@ int main(int argc, char* argv[]) {
         // Update pheromons received from other node
         for (j = 0; j < nCities*nCities; j++) {
           pheromonsUpdate[j] += 1;
-          pheromons[j] += otherPheromons[j];
+          tempPheromons[j] += otherPheromons[j];
         }
       }
     }
 
     // Compute the average for each pheromons value received
     for (j = 0; j < nCities*nCities; j++) {
+      pheromons[j] += tempPheromons[j];
       pheromons[j] = pheromons[j] / pheromonsUpdate[j];
-      if (pheromons[j] > 1.0) {
-        pheromons[j] = 1.0;
-      }
     }
 
     // Set own variables with new best values
