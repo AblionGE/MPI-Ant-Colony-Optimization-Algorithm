@@ -1,8 +1,15 @@
 # Conclusion
 
-In conclusion, we can say that this problem scales relatively well if we keep a lot of communications between nodes.
-Indeed, we observed that, if we try to do more computations locally before merging informations, the speedup will be very good, but the result quality will not be acceptable.
+In conclusion, we can say that this problem scales relatively well even if we must keep a lot of communications between nodes.
+Indeed, if we select carefully the number of nodes and the number of ants, we can have a good speedup.
 
-We should also be really careful with the argument we give to the program.
-Indeed, as the algorithm is random, we need to give enough time (loops) to the serial implementation to have time to converge to an optimal (or at least to a really good suboptimal) solution.
-The values of $\alpha$ and $\beta$ can also be tuned to change during the execution of the program to give more importance to distances at the beginning of the execution and to give more weight to pheromons at the end.
+We also saw that to have an optimal result, we need to be careful with arguments given to the program.
+The choice of the map size and the number of ants strongly impacts the number of iterations to do to be sure to have an optimal results.
+If the number of iterations is too low, the program will not have the time to find the optimal solution.
+If we give too much iterations, we will kill the speedup and loose all the gain of parallelizing this problem.
+Thus, the choice of the number of iterations is delicate.
+
+We also can notice that other arguments ($\alpha$ and $\beta$) are also important for this algorithm.
+Indeed, to improve its efficiency, we can implement an algorithm where these values evolves during the execution to give more importance to distance at the start of the algorithm and to privilege pheromons at the end.
+This improvement can also helps to obtain a good result easily and thus to improve the parallel implementation.
+

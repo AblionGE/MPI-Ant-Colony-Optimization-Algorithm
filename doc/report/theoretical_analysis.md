@@ -1,4 +1,5 @@
 # Theoretical Analysis
+\label{theoretical_analysis}
 
 ## Serial application
 

@@ -857,6 +857,20 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \label{relative1}
 \end{figure}
 
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  & \bf Serial Time & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+  \hline
+  \bf Execution Time & 11020.097182 & 11498.497093 & 6082.637220  & 3370.134546    & 2011.000059        & 1348.943900\\
+  \hline
+  \bf Relative Speedup & & 1.000000& 1.890380& 3.411880& 5.717800& 8.524073\\
+  \hline
+  \end{tabular}
+  \caption{\it Parallel Algorithm 2 - Times for each execution in ms.}
+\end{figure}
+
 \FloatBarrier
 
 \textbf{Second parallel implementation (figure \ref{relative2})}
@@ -865,6 +879,20 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \centering \includegraphics[scale=0.8]{img/RelativeSpeeduprandom1_2.pdf}
   \caption{\it Parallel algorithm 2 - Relative speedup for random file 1 from results in figure \ref{onewithout1}}
   \label{relative2}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  & \bf Serial Time & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+  \hline
+  \bf Execution Time & 11020.097182 & 11525.187912 & 6087.934365  & 3369.249516    & 2013.014723        & 1347.747293\\
+  \hline
+  \bf Relative Speedup & & 1.000000& 1.893119& 3.420698& 5.725337& 8.551445\\
+  \hline
+  \end{tabular}
+  \caption{\it Parallel Algorithm 2 - Times for each execution in ms.}
 \end{figure}
 
 \FloatBarrier
@@ -877,6 +905,20 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \label{relative3}
 \end{figure}
 
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  & \bf Serial Time & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+  \hline
+  \bf Execution Time & 11020.097182 & 11536.970434 & 6187.463539  & 3640.974301    & 2756.442646        & 3106.276513\\
+  \hline
+  \bf Relative Speedup & & 1.000000& 1.864571& 3.168649& 4.185456& 3.714083\\
+  \hline
+  \end{tabular}
+  \caption{\it Parallel Algorithm 3 - Times for each execution in ms.}
+\end{figure}
+
 ### Absolute Speedup
 
 \textbf{First parallel implementation (figure \ref{absolute1})}
@@ -885,6 +927,20 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \centering \includegraphics[scale=0.8]{img/AbsoluteSpeeduprandom1_1.pdf}
   \caption{\it Parallel algorithm 1 - Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
   \label{absolute1}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  & \bf Serial Time & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+  \hline
+  \bf Execution Time & 11020.097182 & 11498.497093 & 6082.637220  & 3370.134546    & 2011.000059        & 1348.943900\\
+  \hline
+  \bf Absolute Speedup & & 0.958394 & 1.811730 & 3.269927 & 5.479908 & 8.169425\\
+  \hline
+  \end{tabular}
+  \caption{\it Parallel Algorithm 1 - Times for each execution in ms.}
 \end{figure}
 
 \FloatBarrier
@@ -897,6 +953,20 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \label{absolute2}
 \end{figure}
 
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  & \bf Serial Time & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+  \hline
+  \bf Execution Time & 11020.097182 & 11525.187912 & 6087.934365  & 3369.249516    & 2013.014723        & 1347.747293\\
+  \hline
+  \bf Absolute Speedup & & 0.956175 & 1.810153 & 3.270786 & 5.474424 & 8.176679\\
+  \hline
+  \end{tabular}
+  \caption{\it Parallel Algorithm 2 - Times for each execution in ms.}
+\end{figure}
+
 \FloatBarrier
 
 \textbf{Third parallel implementation (figure \ref{absolute3})}
@@ -905,6 +975,20 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \centering \includegraphics[scale=0.8]{img/AbsoluteSpeeduprandom1_3.pdf}
   \caption{\it Parallel algorithm 3 - Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
   \label{absolute3}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  & \bf Serial Time & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
+  \hline
+  \bf Execution Time & 11020.097182 & 11536.970434 & 6187.463539  & 3640.974301    & 2756.442646        & 3106.276513\\
+  \hline
+  \bf Absolute Speedup & & 0.955198 & 1.781036 & 3.026689 & 3.997941 & 3.547687\\
+  \hline
+  \end{tabular}
+  \caption{\it Parallel Algorithm 3 - Times for each execution in ms.}
 \end{figure}
 
 ### Comparison with Theoretical Speedup
@@ -936,20 +1020,175 @@ Figure \ref{comparison_theoretical} shows for each parallel implementation the a
 
 ### Comments
 
-We can observe in these graphs that, as expected, the theoretical speedup is clearly too optimistic.
+We can observe in these graphs that, as expected, the theoretical speedup is clearly too much optimistic.
 Indeed, the main reasons why the speedups are not so good is that communications take more time than expected and we must send more than only the best path to be able to process the algorithm correctly.
 
-Between the parallel algorithm themselves, we observe that the third implementation as clearly the worst speedup of all implementations.
+Between the parallel algorithms themselves, we observe that the third implementation as clearly the worst speedup of all implementations.
 This is totally normal as we send all the pheromon's matrix in this implementation.
 Therefore, there are more communications to do and thus they take more time when there are many nodes.
 
-About solutions that are not optimal\footnote{You can find them attached to this report.}, we can observe that speedups are really good thanks to improvements made.
+We also can observe that, with 16 nodes, the third implementation has a worst speedup than with only 8 nodes.
+It indicates us this algorithm does not scale well.
+
+About solutions that are not optimal\footnote{You can find them attached to this report.}, we can observe that speedups are really good thanks to improvements (local iterations, termination condition).
 Indeed, I tried to reduce communications and it works.
-Speedups are really good (even better than good with the additional termination condition), but as the optimality of the result is not guaranteed, these solution are not interesting.
+Speedups are really good (even better than good with the additional termination condition), but as the optimality of the result is not guaranteed, these solutions are not interesting.
 
 ### Other measurements
 
-Below, you can find different speedups for experiments with different problem sizes.
+Below, you can find different experiments with different problem sizes.
 Values used to create these graphs can be found on the DVD attached to this report.
 
-We observe in these graphs that ... TODO
+All these experiments were made with only one iteration locally and without the termination condition.
+The changed arguments are the size of the city, the number of ants and the maximum number of iterations.
+
+\textbf{250 cities with 32 ants and 15'000 iterations (first algorithm)}
+
+\begin{figure}[!h]
+  \centering
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.6]{img/RelativeSpeeduprandom1_250_1.pdf}
+    \caption{\it Relative Speedup}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.6]{img/AbsoluteSpeeduprandom1_250_1.pdf}
+    \caption{\it Absolute Speedup}
+  \end{subfigure}
+  \caption{\it First parallel implementation - Speedups for 250 cities, 32 ants and 15'000 iterations.}
+  \label{250cities}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+  \hline
+  \bf Serial beats Parallel & 0 & 0  & 0    & 1        & 0\\
+  \hline
+  \bf Parallel beats Serial & 0 & 5  & 5    & 4        & 5\\
+  \hline
+  \end{tabular}
+  \caption{\it Summary of measurements comparison between serial and parallel implementation for 250 cities, 32 ants and 15'000 iterations.}
+  \label{table_250cities}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{100 cities with 32 ants and 15'000 iterations (first algorithm)}
+
+\begin{figure}[!h]
+  \centering
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.6]{img/RelativeSpeeduprandom1_100_1.pdf}
+    \caption{\it Relative Speedup}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.6]{img/AbsoluteSpeeduprandom1_100_1.pdf}
+    \caption{\it Absolute Speedup}
+  \end{subfigure}
+  \caption{\it First parallel implementation - Speedups for 250 cities, 32 ants and 15'000 iterations.}
+  \label{100cities}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+  \hline
+  \bf Serial beats Parallel & 0 & 1  & 1    & 2        & 2\\
+  \hline
+  \bf Parallel beats Serial & 0 & 4  & 4    & 3        & 3\\
+  \hline
+  \end{tabular}
+  \caption{\it Summary of measurements comparison between serial and parallel implementation for 100 cities, 32 ants and 15'000 iterations.}
+  \label{table_100cities}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{100 cities with 16 ants and 15'000 iterations (first algorithm)}
+
+\begin{figure}[!h]
+  \centering
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.6]{img/RelativeSpeeduprandom1_100_16_1.pdf}
+    \caption{\it Relative Speedup}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.6]{img/AbsoluteSpeeduprandom1_100_16_1.pdf}
+    \caption{\it Absolute Speedup}
+  \end{subfigure}
+  \caption{\it First parallel implementation - Speedups for 100 cities, 16 ants and 15'000 iterations.}
+  \label{100cities_16}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+  \hline
+  \bf Serial beats Parallel & 0 & 3  & 2    & 3        & 2\\
+  \hline
+  \bf Parallel beats Serial & 0 & 2  & 3    & 2        & 3\\
+  \hline
+  \end{tabular}
+  \caption{\it Summary of measurements comparison between serial and parallel implementation for 100 cities, 16 ants and 15'000 iterations.}
+  \label{table_100cities_16}
+\end{figure}
+
+\FloatBarrier
+
+\textbf{100 cities with 64 ants and 15'000 iterations (first algorithm)}
+
+\begin{figure}[!h]
+  \centering
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.6]{img/RelativeSpeeduprandom1_100_64_1.pdf}
+    \caption{\it Relative Speedup}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.6]{img/AbsoluteSpeeduprandom1_100_64_1.pdf}
+    \caption{\it Absolute Speedup}
+  \end{subfigure}
+  \caption{\it First parallel implementation - Speedups for 100 cities, 64 ants and 15'000 iterations.}
+  \label{100cities_64}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|}
+  \hline
+  \bf Serial beats Parallel & 0 & 2  & 1    & 2        & 2\\
+  \hline
+  \bf Parallel beats Serial & 0 & 3  & 4    & 3        & 3\\
+  \hline
+  \end{tabular}
+  \caption{\it Summary of measurements comparison between serial and parallel implementation for 100 cities, 64 ants and 15'000 iterations.}
+  \label{table_100cities_64}
+\end{figure}
+
+\FloatBarrier
+
+#### Comments
+
+With these results, we can observe several things.
+Indeed, in terms of optimality, the experiments made in section \ref{optimality_section} have shown that first and second implementation of the parallel algorithm have always beaten serial implementation.
+Here, with smaller problems, we observe that the first algorithm is as good as the serial one (figure \ref{table_100cities_16} for example). Thus, in section \ref{optimality_section}, the serial implementation did not have the time to obtain a really good result.
+
+To avoid this problem, we simply need to do more iterations, but as we observed in this report, the parallel implementation converges faster to an optimum.
+The termination condition could be here something good to really improve the performances of the parallel algorithm.
+Nevertheless, this termination condition should be carefully chosen because we observed that there is a huge risk that the parallel implementation stays stucked in a suboptimal solution (as observed in this report).
+
+We also see that the number of ants is important to have a good speedup, as claimed in section \ref{theoretical_analysis}.
+Indeed, with 16 ants (figure \ref{100cities_16}), the speedup is worst than with 64 (figure \ref{100cities_64}).
+
+Thus, we can conclude that, to have a good speedup, the problem has to be huge and we need to have a lot of ants compared to the number of nodes.
+
+
+
+\newpage{}
