@@ -1,3 +1,8 @@
+% Ant Colony Optimization Algorithm with MPI
+% Schaer Marc
+
+% Compute fraction of serial code with considering data transfer
+
 nants = [1 2 4 8 16];
 nodes = [1 2 4 8 16];
 c = 1000

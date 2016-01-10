@@ -1,3 +1,11 @@
+/**
+ *
+ * Ant Colony Traveling Salesman Problem Optimization - MPI
+ * Generate Random Numbers
+ * Marc Schaer
+ *
+ **/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

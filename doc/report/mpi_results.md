@@ -1,6 +1,8 @@
 # MPI Results
 
 In this section, I will present the results obtained with a MPI program for the *ant colony optimization problem*.
+All following results were obtained from the *Bellatrix* cluster from *SCITAS*.
+Informations about *Bellatrix* can be found on its official website\footnote{http://scitas.epfl.ch/hardware/bellatrix-hardware}.
 
 ## Implementation 
 
@@ -868,7 +870,7 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \bf Relative Speedup & & 1.000000& 1.890380& 3.411880& 5.717800& 8.524073\\
   \hline
   \end{tabular}
-  \caption{\it Parallel Algorithm 2 - Times for each execution in ms.}
+  \caption{\it Parallel Algorithm 2 - Times for each execution in ms and speedups.}
 \end{figure}
 
 \FloatBarrier
@@ -892,7 +894,7 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \bf Relative Speedup & & 1.000000& 1.893119& 3.420698& 5.725337& 8.551445\\
   \hline
   \end{tabular}
-  \caption{\it Parallel Algorithm 2 - Times for each execution in ms.}
+  \caption{\it Parallel Algorithm 2 - Times for each execution in ms and speedups.}
 \end{figure}
 
 \FloatBarrier
@@ -916,7 +918,7 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \bf Relative Speedup & & 1.000000& 1.864571& 3.168649& 4.185456& 3.714083\\
   \hline
   \end{tabular}
-  \caption{\it Parallel Algorithm 3 - Times for each execution in ms.}
+  \caption{\it Parallel Algorithm 3 - Times for each execution in ms and speedups.}
 \end{figure}
 
 ### Absolute Speedup
@@ -940,7 +942,7 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \bf Absolute Speedup & & 0.958394 & 1.811730 & 3.269927 & 5.479908 & 8.169425\\
   \hline
   \end{tabular}
-  \caption{\it Parallel Algorithm 1 - Times for each execution in ms.}
+  \caption{\it Parallel Algorithm 1 - Times for each execution in ms and speedups.}
 \end{figure}
 
 \FloatBarrier
@@ -964,7 +966,7 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \bf Absolute Speedup & & 0.956175 & 1.810153 & 3.270786 & 5.474424 & 8.176679\\
   \hline
   \end{tabular}
-  \caption{\it Parallel Algorithm 2 - Times for each execution in ms.}
+  \caption{\it Parallel Algorithm 2 - Times for each execution in ms and speedups.}
 \end{figure}
 
 \FloatBarrier
@@ -988,7 +990,7 @@ The following speedups are the ones from file *rand1* from figure \ref{onewithou
   \bf Absolute Speedup & & 0.955198 & 1.781036 & 3.026689 & 3.997941 & 3.547687\\
   \hline
   \end{tabular}
-  \caption{\it Parallel Algorithm 3 - Times for each execution in ms.}
+  \caption{\it Parallel Algorithm 3 - Times for each execution in ms and speedups.}
 \end{figure}
 
 ### Comparison with Theoretical Speedup

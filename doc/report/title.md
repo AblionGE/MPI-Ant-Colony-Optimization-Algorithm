@@ -45,4 +45,3 @@ Marc \textsc{Schär}\\
 
 \end{center}
 \end{titlepage}
-

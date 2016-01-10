@@ -12,4 +12,3 @@ Thus, the choice of the number of iterations is delicate.
 We also can notice that other arguments ($\alpha$ and $\beta$) are also important for this algorithm.
 Indeed, to improve its efficiency, we can implement an algorithm where these values evolves during the execution to give more importance to distance at the start of the algorithm and to privilege pheromons at the end.
 This improvement can also helps to obtain a good result easily and thus to improve the parallel implementation.
-
