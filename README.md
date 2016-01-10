@@ -44,6 +44,10 @@ To run serial implementation and generation of map and random numbers, you simpl
 
 ## Remarks
 
+### Shell
+
+To use scripts to get results, you need to have ```zsh``` installed.
+
 ### Subdirectories
 
 README files can be found in subdirectories
@@ -52,3 +56,7 @@ README files can be found in subdirectories
 
 The given implementations are not using the termination condition in the ```while``` loop (there are warnings during compilation about that).
 To use it, you just need to uncomment the condition in each file.
+
+### Source code
+
+The source code and the report can also be found here: https://github.com/AblionGE/MPI-Ant-Colony-Optimization-Algorithm
