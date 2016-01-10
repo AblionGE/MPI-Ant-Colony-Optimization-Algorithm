@@ -5,6 +5,8 @@ header-includes:
   - \usepackage[english]{babel}
   - \usepackage{fancyvrb}
   - \usepackage{placeins}
+  - \usepackage{caption}
+  - \usepackage{subcaption}
   - \pagestyle{fancy}
   - \lhead{M. Schär}
   - \chead{PPOPC}

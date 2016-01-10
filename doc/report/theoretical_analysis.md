@@ -9,9 +9,9 @@ Then, the algorithm will loop until a termination condition is reached\footnote{
 This "big" loop will make at most $L$ iterations.
 In this loop, there is another loop for simulating ants (we have $A$ ants).
 In it, there is a loop to go through each city ($c$ cities) where we have to compute the probabilities to go to a specific city ($O(c)$).
-Finally, we have to perform the pheromon evaporation ($O(c^2)$) and we have to update the pheromon's matrix with the new pheromon's values from ants ($O(c)$ because we have to update only the best path.
+Finally, we have to perform the pheromon's evaporation ($O(c^2)$) and we have to update the pheromon's matrix with the new pheromon's values from ants ($O(c)$ because we have to update only the best path).
 
-The skeleton of the serial application is like this pseudo-code :
+The skeleton of the serial application is like this pseudo-code:
 
 ```java
 init() // 2*c*c operations
@@ -47,14 +47,14 @@ And, at the end of each iteration, each node will have the share its result (bes
 Then, each node will compute the paths of multiple ants ($O(c \cdot \frac{A}{n})$).
 We assume that each node has the same number of ants.
 The computation on each node is exactly the same as in the serial application except that each node has only a subset of ants.
-We can add that if we want to do several iteration before merging the results, we will simply multiple this cost by a constant, which will not change the bounded complexity.
+We can add that if we want to do several iterations before merging the results, we will simply multiply this cost by a constant, which will not change the bounded complexity.
 
 Then, when they all have finished to compute the new map with new pheromon's values, all nodes send their local best path to the others.
 The cost of sending all vectors is $O(cn)$.
 
-Finally, each node will merge all received vectors ($O(c \cdot n)$ additions) and will perform the *pheromon evaporation* ($O(c^2)$) and decide if another iteration is needed or not.
+Finally, each node will merge all received vectors ($O(c \cdot n)$ additions) and will perform the *pheromons evaporation* ($O(c^2)$) and decide if another iteration is needed or not.
 
-Thus, for computation time we have a cost of $O(L \cdot (c \cdot \frac{A}{n} + c \cdot n + c^2))$ and for communication time we have a cost of $O(c^2 + L \cdot c \cdot n)$\footnote{We share only the best path from each node.} because each has to send its best path at each iteration.
+Thus, for computation time we have a cost of $O(L \cdot (c \cdot \frac{A}{n} + c \cdot n + c^2))$ and for communication time we have a cost of $O(c^2 + L \cdot c \cdot n)$\footnote{We share only the best path from each node.} because each node has to send its best path at each *external* iteration.
 
 The *Computation/Communication* ratio is $\frac{O(L \cdot (c \cdot \frac{A}{n} + cn + c^2))}{O(c^2 + L \cdot c \cdot n)}$ which tells us that the size of the problem will not make the communications less important. In fact, the only way to have more computations than communications is to have $\frac{A}{n} > c$.
 
@@ -62,7 +62,7 @@ We conclude that the communications are really costly for this algorithm.
 
 #### Amdhal's law
 
-The Amdhal's law gives us a theoretical speedup when we improve ressource for a problem of a fixed size.
+The Amdhal's law gives us a theoretical speedup when we improve resource for a problem of a fixed size.
 For the *ant colony optimization problem*, we can define this theoretical upper bound limitation as follows, where $n$ is the number of nodes and $f$ is a fraction of the code that cannot be parallelized :
 
 $$
@@ -83,6 +83,7 @@ Thus, $$f = \frac{c \cdot (L \cdot n + c)}{c \cdot (L \cdot n + c) + L \cdot c^2
 Here, we observe that $A$ and $n$ are important. To have a small $f$, we need to have more ants than nodes. It is logical, because to have an efficient parellelization of this program, nodes must have something to compute (the computation time on nodes must be big compared to communications.
 
 Table \ref{table_without_data_transfer} and figure \ref{without_data_transfer} show us the important relation between the number of ants and nodes.
+They also show us that more we have nodes, more we have serial code execution.
 
 \begin{figure}[!h]
 \begin{center}
@@ -172,7 +173,7 @@ Then, for the merge with other nodes, we only send the best path (which needs to
 
 Finally, every node has to merge all other nodes results : $O(L' \cdot c \cdot n)$.
 
-The $Computation/Communication$ ratio is $$\frac{c^2 + L' \cdot (l \cdot c \cdot \frac{A}{n} + c \cdot n)}{c^2 + L' \cdot c \cdot n} = \frac{c + L' \cdot (l \cdot \frac{A}{n} + n)}{c + L' \cdot n}$$.
+The $Computation/Communication$ ratio is $$\frac{c^2 + L' \cdot (l \cdot c \cdot \frac{A}{n} + c \cdot n)}{c^2 + L' \cdot c \cdot n} = \frac{c + L' \cdot (l \cdot \frac{A}{n} + n)}{c + L' \cdot n}$$
 
 Here we can conclude that the larger is the problem (in term of ants, city and thus local iterations), the smaller is the impact of communication.
 Nevertheless, more we have nodes, more are the communications important (this seems totally logic).
@@ -217,12 +218,19 @@ We observe (table \ref{improved_table_without_data_transfer} and figure \ref{imp
   \label{improved_without_data_transfer}
 \end{figure}
 
+\newpage{}
+
 ##### More accurate estimation
 
 For having a more accurate estimation, we consider the communication time. As we defined above, we consider the send of the whole matrix ($c^2$) to each node and the send of all best paths ($L' \cdot c \cdot n$).
-Thus, we have :
+Thus, we have the formula presented in figure \ref{formula1}.
 
+\begin{figure}[!h]
+  \centering
 $$f = \frac{2 * (c^2 + L' \cdot n \cdot c)}{2 * (c^2 + L' \cdot n \cdot c) + \frac{L' \cdot l \cdot c^2 \cdot A}{n}} = \frac{2 * (c + L' \cdot n)}{2 * (c + L' \cdot n) + \frac{L' \cdot l \cdot c \cdot A}{n}}$$
+  \caption{\it Amdhal's law for improved implementation.}
+  \label{formula1}
+\end{figure}
 
 Again, we can observe (table \ref{improved_table_with_data_transfer} and figure \ref{improved_with_data_transfer}) that the number of ants and the number of local iterations is important to define the speedup, but, here, the number of cities makes the communication more dominant. It is logic, because the vectors will be bigger so the communications increase with the number of cities and the number of nodes.
 
@@ -298,6 +306,7 @@ I also consider that all similar operations take the same time to be executed.
 
 In fact, this is true.
 Indeed, all comunications are sending only one value so, without considering problems on the network, it should always take the same time to be executed.
+And even if we send the whole matrix at one time, the matrix will always have the same size, and we can expect to always have the same communication time.
 For computations, if all nodes have the same number of ants to manage, they will have a similar computation time (if the machines have an identical architecture and hardware) because in all cases the map has the same size, and each city has the same number of neighbours to consider.
 
 \begin{figure}[!h]
@@ -344,9 +353,8 @@ With these values, we can do some computations to estimate the time for computat
   \label{theoretical_speedup}
 \end{figure}
 
-We can observe in figures \ref{computations} and \ref{theoretical_speedup} that with a few ants, adding nodes is not a good solution, especially if we add nodes that have nothing to do.
-On the contrary, with more ants, we clearly see that adding nodes improves performances.
-We can already expect that with the variance of the network speed, the practical speedup will not be as good as here.
+We can observe in figures \ref{computations} and \ref{theoretical_speedup} that adding nodes improves the performances of the program.
+Nevertheless, we can already expect that with the variance of the network speed, the practical speedup will not be as good as here.
 
 
 ### Critical Path and Theoretical Speedup
@@ -400,6 +408,6 @@ To have good performances, we need to have $t_p$ as small as possible. Ideally, 
 
 #### Remarks
 
-We can note that, in this analysis, we always compare the serial and the parallel implementation when they have exactly the same number of iterations. It allows us to have acceptable results. Nevertheless, we will see in next section that we can have another termination condition which is a certain cost for a path that stays the same for a certain number of iterations (we assume that the result cannot be better in this case). We will observe that some techniques we use to parallelize are not very good in term of result's optimality (even if it as a really good speedup).
+We can note that, in this analysis, we always compare the serial and the parallel implementations when they have exactly the same number of iterations. It allows us to have acceptable results. Nevertheless, we will see in next section that we can have another termination condition which is a certain cost for a path that stays the same for a certain number of iterations (we assume that the result cannot be better in this case). We will observe that some techniques we use to parallelize are not very good in term of result's optimality (even if it as a really good speedup).
 
 \newpage{}

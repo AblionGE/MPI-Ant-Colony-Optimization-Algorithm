@@ -6,7 +6,9 @@ The goal of this project is to anticipate the performance of the parallelized ap
 For this project, I chose to implement an *ant colony optimization algorithm* which gives a solution to the *Traveling Salesman Problem*.
 
 In this report, I will first present a description of the algorithm with a generic pseudo-code, my choices to implement it, the possible problems and solutions and an example of representation of the map.
-Finally, I will make a theoretical analysis of the serial and parallel implementations of the algorithm.
+Then, I will make a theoretical analysis of the serial and parallel implementations of the algorithm.
+Afterwards, I will present results obtained with a MPI implementation, including speedups and comments on the results.
+Finally, I will make a small conclusion.
 
 ## Algorithm
 
@@ -21,7 +23,7 @@ Finally, it updates the visited edges of the best path\footnote{It is a choice t
 
 The final goal is to find the shortest path that starts in a city and that arrives in this city going only once through each other city.
 
-The standard termination condition is defined as a maximum number of iteration or the same shortest solution after a certain number of iterations.
+The standard termination condition is defined as a maximum number of iterations and/or the same shortest solution after a certain number of iterations.
 
 ### Pseudo-code
 
@@ -75,11 +77,12 @@ $$
 where $J_i^k$ is the list of possible moves for an ant $k$ in the city $i$, $\eta_{ij}$ is the *visibility*, which is the inverse of the distance between two cities $i$ and $j$ and $\tau_{ij}$ the intensity of a path (the pheromon values).
 $\alpha$ and $\beta$ are parameters to control the algorithm.
 
-Finally, I also define $\rho \tau_{ij}(t)$ which represent the pheromon evaporation that is computed at each iteration.
+Finally, I also define $\rho \tau_{ij}(t)$ which represents the pheromon evaporation that is computed at each iteration.
 
 ### Pheromon update
 
-At the end of each *external* loop, the pheromon values are updated according to the best path of the current iteration. To spread the pheromon such that shortest paths between several iterations will have more pheromons that longer one, I define this formula :
+At the end of each *external* loop, the pheromon values are updated according to the best path of the current iteration.
+To spread pheromons such that shortest paths between several iterations will have more pheromons than longer ones, I define formula presented in figure \ref{pheromon_update}.
 
 \begin{figure}[!h]
 $$
@@ -88,10 +91,9 @@ $$
 0 & if & (i,j) \not \in T^k(t)\\
 \end{array}\right.
 $$
+\caption{\it Update pheromons definition. $T^k(t)$ is the best path of ant $k$ at iteration $t$, $L^k(t)$ is the length of the path and $Q$i (I chose $Q=1$) is a parameter to be defined.}
 \label{pheromon_update}
 \end{figure}
-
-where $T^k(t)$ is the best path of ant $k$ at iteration $t$, $L^k(t)$ is the length of the path and $Q$\footnote{I choose $Q=1$.} is a parameter to be defined.
 
 ### Representation
 
@@ -102,12 +104,12 @@ As we want to have a fully connected graph, edges that connect unlinked cities w
 Figures \ref{map} and \ref{matrix} show how to represent the map.
 
 \begin{figure}[!h]
-\minipage{0.5\textwidth}
-    \centering \includegraphics[scale=0.7]{img/example_graph.png}
-    \caption{A map composed by cities and paths}
+  \begin{subfigure}{.5\textwidth}
+    \centering \includegraphics[scale=0.5]{img/example_graph.png}
+    \caption{\it A map composed by cities and paths}
     \label{map}
-\endminipage \hfill
-\minipage{0.5\textwidth}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
 $$ 
 \left( \begin{array}{cccccc}
   0 & 5 & 1 & 2 & \infty & \infty \\
@@ -118,13 +120,14 @@ $$
   \infty & \infty & \infty & 3 & 1 & 0 \\
 \end{array} \right)
 $$
-    \caption{The matrix representing figure \ref{map}.}
+    \caption{\it The matrix representing figure \ref{map}.}
     \label{matrix}
-\endminipage
+  \end{subfigure}
+  \caption{\it Representation of a map in a computer.}
 \end{figure}
 
 Each ant will simply be represented by finding a path on the map from different starting points.
-To find a path, the solution is to select a path from the current city (select an element in a column) being careful to not select an already visited city and selecting a city following the formula in section \ref{proba}.
+To find a path, the solution is to select a path from the current city (select an element in a column) being careful to not select an already visited city and selecting a city following the formula in section \ref{formula}.
 
 We can note that the pheromon values need to be stored in a matrix, too. This matrix will have the same construction as the one in figure \ref{matrix}.
 

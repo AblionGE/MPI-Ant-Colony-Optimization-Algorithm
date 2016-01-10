@@ -118,7 +118,7 @@ void updatePheromons(double* pheromons, int* path, long cost, int nCities) {
 }
 ```
 
-I had to limit the maximum value of pheromons to 1 because in some cases, it can become bigger than 1 and then, if the program runs long enough, it can diverge to the infinity.
+I had to limit the maximum value of pheromons to 1 because in some cases, it can become bigger than 1 and then, if the program runs long enough, it can diverge to infinity.
 
 ### Serial
 
@@ -192,7 +192,9 @@ As you can see, the main part of the code is quite simple and is composed by les
 
 ### Parallel
 
-For the parallel implementation, I need to implement communication between nodes. Thus, it will have a lot of communications at the beginning of the execution to share all useful informations (map, number of ants for each node for example) between all nodes. As mentionned in the theoretical analysis, for all of these communications I use *broadcasting*.
+For the parallel implementation, I need to implement communication between nodes.
+Thus, it will have a lot of communications at the beginning of the execution to share all useful informations (map, number of ants for each node for example) between all nodes.
+As mentionned in the theoretical analysis, for all of these communications I use *broadcasting*.
 
 For sharing ants between nodes, we can note that each node computes the distribution.
 This is needed because each node has to know how much ants have the others to take the right random numbers from the file (to have a comparable result at the end of the algorithm with other implementations) :
@@ -255,8 +257,12 @@ Then, receiving nodes have to compare best path with their own and, if the recei
 The merge of pheromons depends on implementation (see subsection \ref{optimality_section}).
 We still can note that for merging pheromons, we always add the received pheromons value with our own and the we compute the average for each edge.
 
+It is also important to know that the ```terminationCondition``` is commented in the provided code to be able to run the algorithm without it.
+
 ## Optimality of results
 \label{optimality_section}
+
+To test the optimality of results, I implemented 3 different parallel algorithm and I tested them with and without the termination condition (stop after having the same result a certain number of iterations).
 
 ### First parallel implementation
 \label{parallel1}
@@ -268,7 +274,7 @@ for (i = 0; i < psize; i++) {
 
   // Communications
 
-  // If i am not node i, I will check if values from node i are better than mine
+  // If I am not node i, I will check if values from node i are better than mine
   if (prank != i) {
     if (otherBestCost < tempBestCost) {
       tempTerminationCondition = otherTerminationCondition;
@@ -317,18 +323,18 @@ All executions were made with 500 cities, 30'000 iterations, $\alpha$ and $\beta
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 206048 & 206048 & 138189 & 111941 & 133976 & 158574\\
+    \bf rand1 & 154496 & 154496 & 148475  & 142521    & 159332        & 143109\\
     \hline
-    \bf rand2 & 170317 & 170317 & 155951 & 122354 & 121297 & 142920\\
+    \bf rand2 & 143087 & 143087 & 139158  & 106823    & 110784        & 127501\\
     \hline
-    \bf rand3 & 162412 & 162412 & 142151 & 126308 & 128463 & 152194\\
+    \bf rand3 & 166698 & 166698 & 137681  & 134531    & 138969        & 137076\\
     \hline
-    \bf rand4 & 174843 & 174843 & 129743 & 136157 & 118470 & 136531\\
+    \bf rand4 & 191951 & 191951 & 144172  & 115838    & 150429        & 147284\\
     \hline
-    \bf rand5 & 179263 & 179263 & 138748 & 121309 & 116606 & 123602\\
+    \bf rand5 & 197345 & 197345 & 122878  & 152242    & 145672        & 145474\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{onewithout1}
 \end{figure}
 
@@ -338,12 +344,12 @@ All executions were made with 500 cities, 30'000 iterations, $\alpha$ and $\beta
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 0 & 0 & 0 & 0\\
+    \bf Serial beats Parallel & 0 & 0  & 0    & 1        & 0\\
     \hline
-    \bf Parallel beats Serial & 0 & 5 & 5 & 5 & 5\\
+    \bf Parallel beats Serial & 0 & 5  & 5    & 4        & 5\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{onewithout1})}
+  \caption{\it Summary of measurements from previous figure (\ref{onewithout1})}
   \label{summary_onewithout1}
 \end{figure}
 
@@ -357,18 +363,18 @@ All executions were made with 500 cities, 30'000 iterations, $\alpha$ and $\beta
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 175888 & 175888 & 189019 & 205045 & 220125 & 224030\\
+    \bf rand1 & 177592 & 177592 & 187736  & 247970    & 257124        & 244105\\
     \hline
-    \bf rand2 & 181575 & 181575 & 186233 & 238031 & 197331 & 232079\\
+    \bf rand2 & 162085 & 162085 & 183043  & 233283    & 214107        & 278220\\
     \hline
-    \bf rand3 & 187249 & 187249 & 217756 & 240954 & 210066 & 234327\\
+    \bf rand3 & 186004 & 186004 & 184833  & 195020    & 226533        & 231918\\
     \hline
-    \bf rand4 & 174060 & 174060 & 212855 & 217611 & 215536 & 232093\\
+    \bf rand4 & 185873 & 185873 & 199568  & 176070    & 233620        & 241308\\
     \hline
-    \bf rand5 & 170319 & 170319 & 184519 & 230064 & 230072 & 286673\\
+    \bf rand5 & 177384 & 177384 & 180036  & 203247    & 260322        & 282898\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{hundredwithout1}
 \end{figure}
 
@@ -378,12 +384,12 @@ All executions were made with 500 cities, 30'000 iterations, $\alpha$ and $\beta
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 4  & 4    & 5        & 5\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 1  & 1    & 0        & 0\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{hundredwithout1})}
+  \caption{\it Summary of measurements from previous figure (\ref{hundredwithout1})}
   \label{summary_hundredwithout1}
 \end{figure}
 
@@ -402,18 +408,18 @@ Thus, I gave up this improvement.
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 169560 & 169560 & 1730115 & 1730115 & 1730115 & 1730115\\
+    \bf rand1 & 178031 & 178031 & 1743417  & 1743417    & 1743417        & 1743417\\
     \hline
-    \bf rand2 & 172790 & 172790 & 1780674 & 1780674 & 1780674 & 1780674\\
+    \bf rand2 & 180789 & 180789 & 1775744  & 1775744    & 1775744        & 1775744\\
     \hline
-    \bf rand3 & 177731 & 177731 & 1779516 & 1779516 & 1779516 & 1779516\\
+    \bf rand3 & 152812 & 152812 & 1728234  & 1728234    & 1728234        & 1728234\\
     \hline
-    \bf rand4 & 193771 & 193771 & 1789632 & 1798642 & 1798642 & 1798642\\
+    \bf rand4 & 188825 & 188825 & 1730664  & 1730664    & 1730664        & 1730664\\
     \hline
-    \bf rand5 & 185177 & 185177 & 1772935 & 1765619 & 1772935 & 1772935\\
+    \bf rand5 & 161276 & 161276 & 1748895  & 1748895    & 1748895        & 1748895\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{onewith1}
 \end{figure}
 
@@ -423,12 +429,12 @@ Thus, I gave up this improvement.
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 5  & 5    & 5        & 5\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 0  & 0    & 0        & 0\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{onewith1})}
+  \caption{\it Summary of measurements from previous figure (\ref{onewith1})}
   \label{summary_onewith1}
 \end{figure}
 
@@ -442,18 +448,18 @@ Thus, I gave up this improvement.
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 180300 & 180300 & 1685680  & 1578882    & 1577008        & 1661177\\
+    \bf rand1 & 181171 & 181171 & 1649680  & 1634016    & 1728163        & 1721699\\
     \hline
-    \bf rand2 & 166614 & 166614 & 1581740  & 1612139    & 1679066        & 1680811\\
+    \bf rand2 & 179519 & 179519 & 1623298  & 1635800    & 1728501        & 1748994\\
     \hline
-    \bf rand3 & 173203 & 173203 & 1576155  & 1680125    & 1740822        & 1679923\\
+    \bf rand3 & 190283 & 190283 & 1632833  & 1548522    & 1687993        & 1753994\\
     \hline
-    \bf rand4 & 173117 & 173117 & 1688282  & 1672961    & 1566590        & 1656622\\
+    \bf rand4 & 146264 & 146264 & 1688079  & 1707766    & 1647953        & 1695028\\
     \hline
-    \bf rand5 & 172340 & 172340 & 1628961  & 1713106    & 1713106        & 1693083\\
+    \bf rand5 & 192344 & 192344 & 1695841  & 1635615    & 1590794        & 1716914\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{hundredwith1}
 \end{figure}
 
@@ -463,12 +469,12 @@ Thus, I gave up this improvement.
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 5  & 5    & 5        & 5\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 0  & 0    & 0        & 0\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{hundredwith1})}
+  \caption{\it Summary of measurements from previous figure (\ref{hundredwith1})}
   \label{summary_hundredwith1}
 \end{figure}
 
@@ -486,18 +492,18 @@ For the second implementation, I tried to share only the best path between all n
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 206048 & 206048 & 137135 & 133420 & 109250 & 135306\\
+    \bf rand1 & 154496 & 154496 & 154576  & 125320    & 137840        & 145875\\
     \hline
-    \bf rand2 & 170317 & 170317 & 159457 & 128820 & 122768 & 160282\\
+    \bf rand2 & 143087 & 143087 & 134842  & 165693    & 140243        & 126733\\
     \hline
-    \bf rand3 & 162412 & 162412 & 146277 & 175978 & 118603 & 149297\\
+    \bf rand3 & 166698 & 166698 & 149265  & 149338    & 123710        & 166576\\
     \hline
-    \bf rand4 & 174843 & 174843 & 146865 & 145787 & 140152 & 124771\\
+    \bf rand4 & 191951 & 191951 & 155158  & 140697    & 164721        & 161000\\
     \hline
-    \bf rand5 & 179263 & 179263 & 168949 & 147701 & 128391 & 140151\\
+    \bf rand5 & 197345 & 197345 & 145260  & 173973    & 112334        & 147570\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{onewithout2}
 \end{figure}
 
@@ -507,12 +513,12 @@ For the second implementation, I tried to share only the best path between all n
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 0 & 1 & 0 & 0\\
+    \bf Serial beats Parallel & 0 & 1  & 1    & 0        & 0\\
     \hline
-    \bf Parallel beats Serial & 0 & 5 & 4 & 5 & 5\\
+    \bf Parallel beats Serial & 0 & 4  & 4    & 5        & 5\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{onewithout2})}
+  \caption{\it Summary of measurements from previous figure (\ref{onewithout2})}
   \label{summary_onewithout2}
 \end{figure}
 
@@ -526,18 +532,18 @@ For the second implementation, I tried to share only the best path between all n
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 175888 & 175888 & 189019 & 205045 & 220125 & 224030\\
+    \bf rand1 & 177592 & 177592 & 187736  & 247970    & 257124        & 244105\\
     \hline
-    \bf rand2 & 181575 & 181575 & 186233 & 238031 & 197331 & 232079\\
+    \bf rand2 & 162085 & 162085 & 183043  & 233283    & 214107        & 278220\\
     \hline
-    \bf rand3 & 187249 & 187249 & 217756 & 240954 & 210066 & 234327\\
+    \bf rand3 & 186004 & 186004 & 184833  & 195020    & 226533        & 231918\\
     \hline
-    \bf rand4 & 174060 & 174060 & 212855 & 217611 & 215536 & 232093\\
+    \bf rand4 & 185873 & 185873 & 199568  & 176070    & 233620        & 241308\\
     \hline
-    \bf rand5 & 170319 & 170319 & 184519 & 230064 & 230072 & 286673\\
+    \bf rand5 & 177384 & 177384 & 180036  & 203247    & 260322        & 282898\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{hundredwithout2}
 \end{figure}
 
@@ -547,12 +553,12 @@ For the second implementation, I tried to share only the best path between all n
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 4  & 4    & 5        & 5\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 1  & 1    & 0        & 0\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{hundredwithout2})}
+  \caption{\it Summary of measurements from previous figure (\ref{hundredwithout2})}
   \label{summary_hundredwithout2}
 \end{figure}
 
@@ -566,18 +572,18 @@ For the second implementation, I tried to share only the best path between all n
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 169560 & 169560 & 1730115 & 1730115 & 1730115 & 1730115\\
+    \bf rand1 & 178031 & 178031 & 1743417  & 1743417    & 1743417        & 1743417\\
     \hline
-    \bf rand2 & 172790 & 172790 & 1780674 & 1780674 & 1780674 & 1780674\\
+    \bf rand2 & 180789 & 180789 & 1775744  & 1775744    & 1775744        & 1775744\\
     \hline
-    \bf rand3 & 177731 & 177731 & 1779516 & 1779516 & 1779516 & 1779516\\
+    \bf rand3 & 152812 & 152812 & 1728234  & 1728234    & 1728234        & 1728234\\
     \hline
-    \bf rand4 & 193771 & 193771 & 1789632 & 1798642 & 1798642 & 1798642\\
+    \bf rand4 & 188825 & 188825 & 1730664  & 1730664    & 1730664        & 1730664\\
     \hline
-    \bf rand5 & 185177 & 185177 & 1772935 & 1765619 & 1772935 & 1772935\\
+    \bf rand5 & 161276 & 161276 & 1748895  & 1748895    & 1748895        & 1748895\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{onewith2}
 \end{figure}
 
@@ -587,12 +593,12 @@ For the second implementation, I tried to share only the best path between all n
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 5  & 5    & 5        & 5\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 0  & 0    & 0        & 0\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{onewith2})}
+  \caption{\it Summary of measurements from previous figure (\ref{onewith2})}
   \label{summary_onewith2}
 \end{figure}
 
@@ -606,18 +612,18 @@ For the second implementation, I tried to share only the best path between all n
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 180300 & 180300 & 1685680 & 1578882 & 1577008 & 1661177\\
+    \bf rand1 & 181171 & 181171 & 1649680  & 1634016    & 1728163        & 1721699\\
     \hline
-    \bf rand2 & 166614 & 166614 & 1581740 & 1612139 & 1679066 & 1680811\\
+    \bf rand2 & 179519 & 179519 & 1623298  & 1635800    & 1728501        & 1748994\\
     \hline
-    \bf rand3 & 173203 & 173203 & 1576155 & 1680125 & 1740822 & 1679923\\
+    \bf rand3 & 190283 & 190283 & 1632833  & 1548522    & 1687993        & 1753994\\
     \hline
-    \bf rand4 & 173117 & 173117 & 1688282 & 1672961 & 1566590 & 1656622\\
+    \bf rand4 & 146264 & 146264 & 1688079  & 1707766    & 1647953        & 1695028\\
     \hline
-    \bf rand5 & 172340 & 172340 & 1628961 & 1713106 & 1713106 & 1693083\\
+    \bf rand5 & 192344 & 192344 & 1695841  & 1635615    & 1590794        & 1716914\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{hundredwith2}
 \end{figure}
 
@@ -627,12 +633,12 @@ For the second implementation, I tried to share only the best path between all n
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 5  & 5    & 5        & 5\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 0  & 0    & 0        & 0\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{hundredwith2})}
+  \caption{\it Summary of measurements from previous figure (\ref{hundredwith2})}
   \label{summary_hundredwith2}
 \end{figure}
 
@@ -652,7 +658,7 @@ if (MPI_Bcast(&otherPheromons[0], nCities * nCities, MPI_DOUBLE, i, MPI_COMM_WOR
 }
 ```
 
-Of course, there will be a lot of communication for nothing (the majority of the matrix will have low values close to 0.
+Of course, there will be a lot of communications for nothing (the majority of the matrix will have low values close to 0).
 
 \textbf{One local iteration without termination condition} (figures \ref{onewithout3} and \ref{summary_onewithout3})
 
@@ -662,18 +668,18 @@ Of course, there will be a lot of communication for nothing (the majority of the
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 206048 & 206048 & 226692 & 229382 & 272316 & 299090\\
+    \bf rand1 & 154496 & 154496 & 176922  & 147007    & 164259        & 159278\\
     \hline
-    \bf rand2 & 170317 & 170317 & 240895 & 202389 & 270666 & 281549\\
+    \bf rand2 & 143087 & 143087 & 140698  & 157945    & 150729        & 160835\\
     \hline
-    \bf rand3 & 162412 & 162412 & 180564 & 197930 & 297000 & 353603\\
+    \bf rand3 & 166698 & 166698 & 149420  & 186936    & 167434        & 162441\\
     \hline
-    \bf rand4 & 174843 & 174843 & 240735 & 227874 & 287405 & 338268\\
+    \bf rand4 & 191951 & 191951 & 177700  & 156597    & 142280        & 160030\\
     \hline
-    \bf rand5 & 179263 & 179263 & 203006 & 226798 & 205372 & 301789\\
+    \bf rand5 & 197345 & 197345 & 199938  & 139334    & 166256        & 162379\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{onewithout3}
 \end{figure}
 
@@ -683,12 +689,12 @@ Of course, there will be a lot of communication for nothing (the majority of the
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 2  & 2    & 3        & 2\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 3  & 3    & 2        & 3\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{onewithout3})}
+  \caption{\it Summary of measurements from previous figure (\ref{onewithout3})}
   \label{summary_onewithout3}
 \end{figure}
 
@@ -702,18 +708,18 @@ Of course, there will be a lot of communication for nothing (the majority of the
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 175888 & 175888 & 157072 & 235568 & 224547 & 319924\\
+    \bf rand1 & 177592 & 177592 & 187736  & 247970    & 257124        & 244105\\
     \hline
-    \bf rand2 & 181575 & 181575 & 190208 & 235288 & 221798 & 293365\\
+    \bf rand2 & 162085 & 162085 & 183043  & 233283    & 214107        & 278220\\
     \hline
-    \bf rand3 & 187249 & 187249 & 162000 & 187241 & 204388 & 262212\\
+    \bf rand3 & 186004 & 186004 & 184833  & 195020    & 226533        & 231918\\
     \hline
-    \bf rand4 & 174060 & 174060 & 185468 & 229670 & 269884 & 415996\\
+    \bf rand4 & 185873 & 185873 & 199568  & 176070    & 233620        & 241308\\
     \hline
-    \bf rand5 & 170319 & 170319 & 176118 & 243859 & 220186 & 307723\\
+    \bf rand5 & 177384 & 177384 & 180036  & 203247    & 260322        & 282898\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{hundredwithout3}
 \end{figure}
 
@@ -723,12 +729,12 @@ Of course, there will be a lot of communication for nothing (the majority of the
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 3 & 4 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 4  & 4    & 5        & 5\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 1  & 1    & 0        & 0\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{hundredwithout3})}
+  \caption{\it Summary of measurements from previous figure (\ref{hundredwithout3})}
   \label{summary_hundredwithout3}
 \end{figure}
 
@@ -742,18 +748,18 @@ Of course, there will be a lot of communication for nothing (the majority of the
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 169560 & 169560 & 1730115 & 1730115 & 1730115 & 1730115\\
+    \bf rand1 & 178031 & 178031 & 1743417  & 1743417    & 1743417        & 1743417\\
     \hline
-    \bf rand2 & 172790 & 172790 & 1600713 & 1715129 & 1780674 & 1733414\\
+    \bf rand2 & 180789 & 180789 & 1775744  & 1775744    & 1775744        & 1775744\\
     \hline
-    \bf rand3 & 177731 & 177731 & 1699064 & 1708854 & 1722617 & 1720331\\
+    \bf rand3 & 152812 & 152812 & 1728234  & 1728234    & 1728234        & 1728234\\
     \hline
-    \bf rand4 & 193771 & 193771 & 1669645 & 1688394 & 1741155 & 1691904\\
+    \bf rand4 & 188825 & 188825 & 1730664  & 1730664    & 1730664        & 1730664\\
     \hline
-    \bf rand5 & 185177 & 185177 & 1618844 & 1686588 & 1765619 & 1690262\\
+    \bf rand5 & 161276 & 161276 & 1748895  & 1748895    & 1748895        & 1748895\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{onewith3}
 \end{figure}
 
@@ -763,12 +769,12 @@ Of course, there will be a lot of communication for nothing (the majority of the
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 5  & 5    & 5        & 5\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 0  & 0    & 0        & 0\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{onewith3})}
+  \caption{\it Summary of measurements from previous figure (\ref{onewith3})}
   \label{summary_onewith3}
 \end{figure}
 
@@ -782,18 +788,18 @@ Of course, there will be a lot of communication for nothing (the majority of the
     \hline
     \bf Best Cost & \bf Serial & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf rand1 & 180300 & 180300 & 1641854 & 1509437 & 1568793 & 1721353\\
+    \bf rand1 & 181171 & 181171 & 1649680  & 1634016    & 1728163        & 1721699\\
     \hline
-    \bf rand2 & 166614 & 166614 & 1632773 & 1559375 & 1598569 & 1737959\\
+    \bf rand2 & 179519 & 179519 & 1623298  & 1635800    & 1728501        & 1748994\\
     \hline
-    \bf rand3 & 173203 & 173203 & 1565889 & 1595390 & 1713859 & 1710915\\
+    \bf rand3 & 190283 & 190283 & 1632833  & 1548522    & 1687993        & 1753994\\
     \hline
-    \bf rand4 & 173117 & 173117 & 1689794 & 1712136 & 1641396 & 1770857\\
+    \bf rand4 & 146264 & 146264 & 1688079  & 1707766    & 1647953        & 1695028\\
     \hline
-    \bf rand5 & 172340 & 172340 & 1641177 & 1691355 & 1713106 & 1743854\\
+    \bf rand5 & 192344 & 192344 & 1695841  & 1635615    & 1590794        & 1716914\\
     \hline
   \end{tabular}
-  \caption{Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
+  \caption{\it Measurements for 5 executions with one local iteration, 30'000 external iterations, 500 cities, $\alpha$ and $\beta$ equal to 1, evaporation coefficient to 0.9 and 32 ants.}
   \label{hundredwith3}
 \end{figure}
 
@@ -803,12 +809,12 @@ Of course, there will be a lot of communication for nothing (the majority of the
     \hline
     \bf Summary & \bf 1 & \bf 2 & \bf 4 & \bf 8 & \bf 16\\
     \hline
-    \bf Serial beats Parallel & 0 & 5 & 5 & 5 & 5\\
+    \bf Serial beats Parallel & 0 & 5  & 5    & 5        & 5\\
     \hline
-    \bf Parallel beats Serial & 0 & 0 & 0 & 0 & 0\\
+    \bf Parallel beats Serial & 0 & 0  & 0    & 0        & 0\\
     \hline
   \end{tabular}
-  \caption{Summary of measurement from previous figure (\ref{hundredwith3})}
+  \caption{\it Summary of measurements from previous figure (\ref{hundredwith3})}
   \label{summary_hundredwith3}
 \end{figure}
 
@@ -822,82 +828,128 @@ The other improvement (local iterations) is also not a good idea. Indeed, we can
 
 Finally, the execution with one local iteration seems to be the good solution to solve this problem. Indeed, we can conclude that sharing informations after each iterations makes the parallel algorithm good in term of optimality, but of course, it increases communications and the parallelization is not as good as expected initially.
 
-About the different parallel implementation, the only interesting thing is that the third implementation (sharing whole pheromon matrix) is not as good as first and second implementation. Indeed, sharing too much informations is probably not really efficient because it can give more importance to uninteresting path whereas first and second implementations give more importance to best paths what can lead quickly to a good solution (which is here always better than the serial solution).
+About the different parallel implementations, the only interesting thing is that the third implementation (sharing whole pheromon matrix) is not as good as first and second implementation.
+Indeed, for the first and second implementations, the solution is often better than the serial algorithm while the third implementation (when everything is shared) is as good as the serial implementation.
+Thus, I am sure that third algorithm is a good one.
+For the first and second, when you observe the costs for the best paths, they are not so much better than the serial one.
+I conclude that having less informations (nodes do not share all the pheromon's matrix) makes them giving less importance to already not important paths.
+
+Thus, these two parallel implementations are giving good results. I guess that they do not stay stucked in a local minimum because of the maximum values of pheromons paths.
+Indeed, when you observe results with the termination condition, parallel algorithms are always worst because they are quickly stucked in a local minimum.
+Limiting the maximum value of pheromons will leave time to better paths to have higher pheromon's values on them and therefore to go out of the suboptimal solution.
 
 ## Speedups
 
 For the different speedups, we can note that for all tests I have made, the speedup always looks like the same. Thus, I will only present one relative and one absolute speedup for one execution of my program, knowing that the others are similar.
-We can note that I will not show here the speedups for execution with the additional termination condition because the result was clearly not optimal and also not the speedups for hundred iterations, for the same reason.
+
+We can note that I will not show here the speedups for execution with the additional termination condition because the results were clearly not optimal and also not the speedups for hundred iterations, for the same reason.
 Nevertheless, they can be found directly in the ```results``` directory.
 
 The following speedups are the ones from file *rand1* from figure \ref{onewithout1}.
 
 ### Relative Speedup
 
-#### First parallel implementation (figure \ref{relative1})
+\textbf{First parallel implementation (figure \ref{relative1})}
 
 \begin{figure}[!h]
   \centering \includegraphics[scale=0.8]{img/RelativeSpeeduprandom1_1.pdf}
-  \caption{Relative speedup for random file 1 from results in figure \ref{onewithout1}}
+  \caption{\it Parallel algorithm 1 - Relative speedup for random file 1 from results in figure \ref{onewithout1}}
   \label{relative1}
 \end{figure}
 
 \FloatBarrier
 
-#### Second parallel implementation (figure \ref{relative2})
+\textbf{Second parallel implementation (figure \ref{relative2})}
 
 \begin{figure}[!h]
   \centering \includegraphics[scale=0.8]{img/RelativeSpeeduprandom1_2.pdf}
-  \caption{Relative speedup for random file 1 from results in figure \ref{onewithout1}}
+  \caption{\it Parallel algorithm 2 - Relative speedup for random file 1 from results in figure \ref{onewithout1}}
   \label{relative2}
 \end{figure}
 
 \FloatBarrier
 
-#### Third parallel implementation (figure \ref{relative3})
+\textbf{Third parallel implementation (figure \ref{relative3})}
 
 \begin{figure}[!h]
   \centering \includegraphics[scale=0.8]{img/RelativeSpeeduprandom1_3.pdf}
-  \caption{Relative speedup for random file 1 from results in figure \ref{onewithout1}}
+  \caption{\it Parallel algorithm 3 - Relative speedup for random file 1 from results in figure \ref{onewithout1}}
   \label{relative3}
 \end{figure}
 
-\FloatBarrier
-
 ### Absolute Speedup
 
-#### First parallel implementation (figure \ref{absolute1})
+\textbf{First parallel implementation (figure \ref{absolute1})}
 
 \begin{figure}[!h]
   \centering \includegraphics[scale=0.8]{img/AbsoluteSpeeduprandom1_1.pdf}
-  \caption{Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
+  \caption{\it Parallel algorithm 1 - Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
   \label{absolute1}
 \end{figure}
 
 \FloatBarrier
 
-#### Second parallel implementation (figure \ref{absolute2})
+\textbf{Second parallel implementation (figure \ref{absolute2})}
 
 \begin{figure}[!h]
   \centering \includegraphics[scale=0.8]{img/AbsoluteSpeeduprandom1_2.pdf}
-  \caption{Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
+  \caption{\it Parallel algorithm 2 - Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
   \label{absolute2}
 \end{figure}
 
 \FloatBarrier
 
-#### Third parallel implementation (figure \ref{absolute3})
+\textbf{Third parallel implementation (figure \ref{absolute3})}
 
 \begin{figure}[!h]
   \centering \includegraphics[scale=0.8]{img/AbsoluteSpeeduprandom1_3.pdf}
-  \caption{Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
+  \caption{\it Parallel algorithm 3 - Absolute speedup for random file 1 from results in figure \ref{onewithout1}}
   \label{absolute3}
+\end{figure}
+
+### Comparison with Theoretical Speedup
+
+Figure \ref{comparison_theoretical} shows for each parallel implementation the absolute, the relative and the theoretical speedup graph.
+
+\begin{figure}[!h]
+  \centering
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{img/first_speedups.png}
+    \caption{\it Speedups for first parallel implementation.}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{img/second_speedups.png}
+    \caption{\it Speedups for second parallel implementation.}
+  \end{subfigure}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[scale=0.32]{img/third_speedups.png}
+    \caption{\it Speedups for third parallel implementation.}
+  \end{subfigure}
+  \caption{\it All speedups in one graph for each parallel implementation.}
+  \label{comparison_theoretical}
 \end{figure}
 
 \FloatBarrier
 
-### Comparison with Theoretical Speedup
-
 ### Comments
 
-\newpage{}
+We can observe in these graphs that, as expected, the theoretical speedup is clearly too optimistic.
+Indeed, the main reasons why the speedups are not so good is that communications take more time than expected and we must send more than only the best path to be able to process the algorithm correctly.
+
+Between the parallel algorithm themselves, we observe that the third implementation as clearly the worst speedup of all implementations.
+This is totally normal as we send all the pheromon's matrix in this implementation.
+Therefore, there are more communications to do and thus they take more time when there are many nodes.
+
+About solutions that are not optimal\footnote{You can find them attached to this report.}, we can observe that speedups are really good thanks to improvements made.
+Indeed, I tried to reduce communications and it works.
+Speedups are really good (even better than good with the additional termination condition), but as the optimality of the result is not guaranteed, these solution are not interesting.
+
+### Other measurements
+
+Below, you can find different speedups for experiments with different problem sizes.
+Values used to create these graphs can be found on the DVD attached to this report.
+
+We observe in these graphs that ... TODO
